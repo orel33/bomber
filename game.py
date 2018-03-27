@@ -31,13 +31,6 @@ BLUE = (0,0,255)
 BANANA = 0
 CHERRY = 1
 
-### Parameters ###
-
-sprite_size = 30 # 30x30 pixels
-win_title = "Bomber Man"
-win_icon = "images/dk/right.png"
-map_file = "maps/map0"
-
 ### Image Files ###
 
 img_backgrounds = [ "images/misc/bg0.png", "images/misc/bg1.png", "images/misc/bg2.png" ]
@@ -48,6 +41,13 @@ img_fire = "images/misc/fire.png"
 img_fruits = [ "images/misc/banana.png", "images/misc/cherry.png" ]
 imgs_dk = [ "images/dk/left.png", "images/dk/right.png", "images/dk/up.png", "images/dk/down.png" ]
 imgs_zelda = [ "images/zelda/left.png", "images/zelda/right.png", "images/zelda/up.png", "images/zelda/down.png" ]
+
+### Parameters ###
+
+sprite_size = 30 # 30x30 pixels
+win_title = "Bomber Man"
+win_icon = img_bomb
+map_file = "maps/map0"
 
 ### Class Map ###
 
@@ -142,7 +142,7 @@ class Bomb:
         self.pos = pos
         self.max_range = MAX_RANGE
         self.countdown = COUNTDOWN
-        self.time_to_explode = COUNTDOWN * 1000 # in ms
+        self.time_to_explode = (COUNTDOWN+1)*1000-1 # in ms
         self.img_bomb = pygame.image.load(img_bomb).convert_alpha()
         self.img_fire = pygame.image.load(img_fire).convert_alpha()
         self.font = pygame.font.SysFont('Consolas', 20)
@@ -160,11 +160,11 @@ class Bomb:
 
     def update(self, dt):
         # subtract the passed time `dt` from the timer each frame
-        if self.time_to_explode > 0:
+        if self.time_to_explode >= 0:
             self.time_to_explode -= dt
-            self.countdown = int(self.time_to_explode / 1000) + 1
+            self.countdown = int(self.time_to_explode / 1000)
         else:
-            self.countdown = 0
+            self.countdown = -1
 
     def explode(self, win):
         x0 = self.pos[X]
@@ -185,7 +185,7 @@ class Bomb:
         win.blit(text, rect)
 
     def render(self, win):
-        if(self.countdown == 1):
+        if(self.countdown == 0):
             self.explode(win)
         elif(self.countdown > 0):
             self.draw(win)
@@ -244,7 +244,7 @@ class Character:
         else: self.disarmed = 0
 
     def explosion(self, bomb):
-        if bomb.countdown != 1: return False
+        if bomb.countdown != 0: return False
         if self.immunity > 0: return False
         horizontal = (self.pos[Y] == bomb.pos[Y] and self.pos[X] >= bomb.range[LEFT] and self.pos[X] <= bomb.range[RIGHT])
         vertical = (self.pos[X] == bomb.pos[X] and self.pos[Y] >= bomb.range[UP] and self.pos[Y] <= bomb.range[DOWN])
@@ -319,7 +319,7 @@ while cont:
     # update bombs (and remove it)
     for bomb in bombs:
         bomb.update(dt)
-        if bomb.countdown == 0: bombs.remove(bomb)
+        if bomb.countdown == -1: bombs.remove(bomb)
 
     # update characters and eat fruits
     for character in characters:
