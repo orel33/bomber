@@ -29,21 +29,24 @@ WALLS = ('w', 'x', 'z')
 BACKGROUNDS = ('0', '1', '2')
 YELLOW = (255, 255, 0)
 BLUE = (0,0,255)
+BANANA = 0
+CHERRY = 1
 
 ### Game Parameters ###
 
 sprite_size = 30 # 30x30 pixels
 win_title = "What a Maze!"
 win_icon = "images/dk/right.png"
+map_file = "maps/map0"
+
 img_backgrounds = [ "images/misc/bg0.png", "images/misc/bg1.png", "images/misc/bg2.png" ]
 img_blank = "images/misc/blank.png"
 img_walls = [ "images/misc/wall0.png", "images/misc/wall1.png", "images/misc/wall2.png" ]
 img_bomb = "images/misc/bomb.png"
 img_fire = "images/misc/fire.png"
-img_banana = "images/misc/banana.png"
+img_fruits = [ "images/misc/banana.png", "images/misc/cherry.png" ]
 imgs_dk = [ "images/dk/left.png", "images/dk/right.png", "images/dk/up.png", "images/dk/down.png" ]
 imgs_zelda = [ "images/zelda/left.png", "images/zelda/right.png", "images/zelda/up.png", "images/zelda/down.png" ]
-map_file = "maps/map0"
 
 ### class Map ###
 
@@ -115,19 +118,20 @@ class Map:
                 if offset == 0: break
         return (x,y)
 
-### class Banana ###
+### class Fruit ###
 
-class Banana:
-    def __init__(self, m, pos):
+class Fruit:
+    def __init__(self, m, kind, pos):
         self.map = m
         self.pos = pos
-        self.img = pygame.image.load(img_banana).convert_alpha()
-        print("set banana at position ({},{})".format(pos[X],pos[Y]))
+        self.imgs = [ pygame.image.load(img).convert_alpha() for img in img_fruits ]
+        self.kind = kind
+        print("set fruit {} at position ({},{})".format(kind, pos[X],pos[Y]))
 
     def render(self, win):
         x = self.pos[X] * sprite_size
         y = self.pos[Y] * sprite_size
-        win.blit(self.img, (x, y))
+        win.blit(self.imgs[self.kind], (x, y))
 
 ### class Bomb ###
 
@@ -224,8 +228,8 @@ class Character:
                     self.pos = (self.pos[X], self.pos[Y]+1)
             self.direction = DOWN
 
-    def eat(self, banana):
-        if banana.pos[X] == self.pos[X] and banana.pos[Y] == self.pos[Y]:
+    def eat(self, fruit):
+        if fruit.pos[X] == self.pos[X] and fruit.pos[Y] == self.pos[Y]:
             self.life += 10
             print("{}\'s life: {}".format(self.nickname, self.life))
             return True
@@ -239,10 +243,11 @@ class Character:
         else: self.disarmed = 0
 
     def explosion(self, bomb):
+        if bomb.countdown != 1: return False
         if self.immunity > 0: return False
         horizontal = (self.pos[Y] == bomb.pos[Y] and self.pos[X] >= bomb.range[LEFT] and self.pos[X] <= bomb.range[RIGHT])
         vertical = (self.pos[X] == bomb.pos[X] and self.pos[Y] >= bomb.range[UP] and self.pos[Y] <= bomb.range[DOWN])
-        if bomb.countdown == 1 and ( horizontal or vertical ):
+        if ( horizontal or vertical ):
             self.life -= 10
             self.immunity = IMMUNITY
             print("{}\'s life: {}".format(self.nickname, self.life))
@@ -276,7 +281,8 @@ dk = Character("dk", m, imgs_dk, m.random() )
 zelda = Character("zelda", m, imgs_zelda, m.random())
 characters = [zelda, dk]
 current = dk
-bananas = [ Banana(m, m.random()) for _ in range(10) ] # 10 bananas
+fruits = [ Fruit(m, BANANA, m.random()) for _ in range(5) ]
+fruits += [ Fruit(m, CHERRY, m.random()) for _ in range(5) ]
 bombs = []
 
 # main loop
@@ -314,23 +320,23 @@ while cont:
         bomb.update(dt)
         if bomb.countdown == 0: bombs.remove(bomb)
 
-    # update characters and eat bananas
+    # update characters and eat fruits
     for character in characters:
         character.update(dt)
-        for banana in bananas:
-            if character.eat(banana): bananas.remove(banana)
+        for fruit in fruits:
+            if character.eat(fruit): fruits.remove(fruit)
 
     # update characters after bomb explosion
     for bomb in bombs:
         for character in characters:
-            if bomb.countdown == 1 and character.explosion(bomb):
+            if character.explosion(bomb):
                 characters.remove(character)
 
     # render all
     m.render(win)
     # m.grid(win)
     for bomb in bombs: bomb.render(win)
-    for banana in bananas: banana.render(win)
+    for fruit in fruits: fruit.render(win)
     for character in characters: character.render(win)
     pygame.display.flip()
 
