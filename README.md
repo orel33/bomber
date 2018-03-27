@@ -2,6 +2,9 @@
 
 This is a simple "Bomber Man" game written in Python 2/3, based on the *pygame* library.
 
+![Bomber Man Snapshot](bomberman.png?raw=true "snapshot")
+
+
 ## Download & Install ##
 
 First clone the project available on GitHUB under GPL:
