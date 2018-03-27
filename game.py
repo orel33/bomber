@@ -13,7 +13,7 @@ print("pygame version: ", pygame.version.ver)
 ### Constants ###
 
 FPS = 30
-LIFE = 50
+HEALTH = 50
 MAX_RANGE = 5
 COUNTDOWN = 5
 IMMUNITY = 1500 # in ms
@@ -74,14 +74,6 @@ class Map:
             self.height = len(self.array)
             self.width = len(self.array[0])
             print("load map \"{}\" of size {}x{}".format(self.filename, self.width, self.height))
-
-    # def grid(self, win):
-    #     # horizontal lines
-    #     for y in range(0,self.height):
-    #         pygame.draw.line(win, BLUE, (0, y*sprite_size), (self.width*sprite_size, y*sprite_size), 1)
-    #     # vertical lines
-    #     for x in range(0,self.width):
-    #         pygame.draw.line(win, BLUE, (x*sprite_size, 0), (x*sprite_size,self.height*sprite_size), 1)
 
     def render(self, win):
         # win.blit(self.background, (0, 0))
@@ -195,7 +187,7 @@ class Bomb:
 class Character:
     def __init__(self, nickname, m, imgs, pos):
         self.map = m
-        self.life = LIFE
+        self.health = HEALTH
         self.immunity = 0 # the character gets immunity against bomb during this time (in ms)
         self.disarmed = 0 # the character cannot drop a bomb during this time (in ms)
         self.nickname = nickname
@@ -231,8 +223,8 @@ class Character:
 
     def eat(self, fruit):
         if fruit.pos[X] == self.pos[X] and fruit.pos[Y] == self.pos[Y]:
-            self.life += 10
-            print("{}\'s life: {}".format(self.nickname, self.life))
+            self.health += 10
+            print("{}\'s health: {}".format(self.nickname, self.health))
             return True
         return False
 
@@ -249,10 +241,10 @@ class Character:
         horizontal = (self.pos[Y] == bomb.pos[Y] and self.pos[X] >= bomb.range[LEFT] and self.pos[X] <= bomb.range[RIGHT])
         vertical = (self.pos[X] == bomb.pos[X] and self.pos[Y] >= bomb.range[UP] and self.pos[Y] <= bomb.range[DOWN])
         if ( horizontal or vertical ):
-            self.life -= 10
+            self.health -= 10
             self.immunity = IMMUNITY
-            print("{}\'s life: {}".format(self.nickname, self.life))
-        if self.life <= 0:
+            print("{}\'s health: {}".format(self.nickname, self.health))
+        if self.health <= 0:
             print("{} is dead!".format(self.nickname))
             return True
         return False
