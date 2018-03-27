@@ -16,8 +16,8 @@ print("pygame version: ", pygame.version.ver)
 ### Game Constants ###
 
 FPS = 30
-RIGHT = 0
-LEFT = 1
+LEFT = 0
+RIGHT = 1
 UP = 2
 DOWN = 3
 
@@ -30,8 +30,8 @@ img_bg = "images/misc/bg1.png"
 img_wall = "images/misc/wall.png"
 img_bomb = "images/misc/bomb.png"
 img_banana = "images/misc/banana.png"
-imgs_dk = [ "images/dk/right.png", "images/dk/left.png", "images/dk/up.png", "images/dk/down.png" ]
-imgs_zelda = [ "images/zelda/right.png", "images/zelda/left.png", "images/zelda/up.png", "images/zelda/down.png" ]
+imgs_dk = [ "images/dk/left.png", "images/dk/right.png", "images/dk/up.png", "images/dk/down.png" ]
+imgs_zelda = [ "images/zelda/left.png", "images/zelda/right.png", "images/zelda/up.png", "images/zelda/down.png" ]
 map_file = "map1"
 yellow = (255, 255, 0)
 blue = (0,0,255)
@@ -101,11 +101,12 @@ class Map:
 ### class Banana ###
 
 class Banana:
-    def __init__(self, pos_x, pos_y):
+    def __init__(self, m, pos_x, pos_y):
+        self.map = m
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.img = pygame.image.load(img_banana).convert_alpha()
-        print("generate random banana at position ({},{})".format(pos_x,pos_y))
+        print("set banana at position ({},{})".format(pos_x,pos_y))
 
     def render(self, win):
         x = self.pos_x * sprite_size
@@ -115,14 +116,31 @@ class Banana:
 ### class Bomb ###
 
 class Bomb:
-    def __init__(self, pos_x, pos_y, max_range=5, time_to_explode=5000):
+    def __init__(self, m, pos_x, pos_y, max_range=5, time_to_explode=5000):
+        self.map = m
         self.pos_x = pos_x
         self.pos_y = pos_y
-        self.range = max_range
+        self.max_range = max_range
         self.time_to_explode = time_to_explode
         self.img = pygame.image.load(img_bomb).convert_alpha()
         self.font = pygame.font.SysFont('Consolas', 20)
-        self.range = [] # in four directions
+        self.range = self.build()
+        print("set bomb at position ({},{}) with range {}".format(pos_x,pos_y,self.range))
+
+    def build(self):
+        for xmax in range(self.pos_x, self.pos_x + self.max_range):
+            if xmax >= m.width or self.map.array[self.pos_y][xmax] != '0':
+                break
+        for ymax in range(self.pos_y, self.pos_y + self.max_range):
+            if ymax >= m.height or self.map.array[ymax][self.pos_x] != '0':
+                    break
+        for xmin in range(self.pos_x, self.pos_x - self.max_range, -1):
+            if xmin < 0 or self.map.array[self.pos_y][xmin] != '0':
+                break
+        for ymin in range(self.pos_y, self.pos_y - self.max_range, -1):
+            if ymin < 0 or self.map.array[ymin][self.pos_x] != '0':
+                break
+        return [xmin+1, xmax-1, ymin+1, ymax-1]
 
     def update(self, dt):
         # subtract the passed time `dt` from the timer each frame.
@@ -135,10 +153,10 @@ class Bomb:
         x0 = x + sprite_size/2
         y0 = y + sprite_size/2
         thick = 2
-        pygame.draw.line(win, yellow, (x0,y0-thick/2), (x0+sprite_size/2+(sprite_size*self.max_range),y0-thick/2), thick) # horizontal right
-        pygame.draw.line(win, yellow, (x0,y0-thick/2), (x0-sprite_size/2-(sprite_size*self.max_range),y0-thick/2), thick) # horizontal left
-        pygame.draw.line(win, yellow, (x0-thick/2,y0), (x0-thick/2,y0+sprite_size/2+(sprite_size*self.max_range)), thick) # vertical down
-        pygame.draw.line(win, yellow, (x0-thick/2,y0), (x0-thick/2,y0-sprite_size/2-(sprite_size*self.max_range)), thick) # vertical up
+        pygame.draw.line(win, yellow, (x0,y0-thick/2), (x0+sprite_size/2+(sprite_size*self.range[RIGHT]),y0-thick/2), thick) # horizontal right
+        pygame.draw.line(win, yellow, (x0,y0-thick/2), (x0-sprite_size/2-(sprite_size*self.range[LEFT]),y0-thick/2), thick) # horizontal left
+        pygame.draw.line(win, yellow, (x0-thick/2,y0), (x0-thick/2,y0+sprite_size/2+(sprite_size*self.range[DOWN])), thick) # vertical down
+        pygame.draw.line(win, yellow, (x0-thick/2,y0), (x0-thick/2,y0-sprite_size/2-(sprite_size*self.range[UP])), thick) # vertical up
 
     def render(self, win):
         x = self.pos_x * sprite_size
@@ -157,7 +175,8 @@ class Bomb:
 ### class Character ###
 
 class Character:
-    def __init__(self, nickname, imgs, pos_x, pos_y):
+    def __init__(self, nickname, m, imgs, pos_x, pos_y):
+        self.map = m
         self.score = 0
         self.nickname = nickname
         self.imgs = [ pygame.image.load(img).convert_alpha() for img in imgs ]
@@ -165,29 +184,29 @@ class Character:
         self.pos_y = pos_y
         self.direction = RIGHT
 
-    def move(self, m, direction):
+    def move(self, direction):
         # move right
-        if direction == 'right':
+        if direction == RIGHT:
             if self.pos_x < (m.width - 1):  # check board limit
-                if m.array[self.pos_y][self.pos_x + 1] != 'w':  # check wall
+                if self.map.array[self.pos_y][self.pos_x + 1] != 'w':  # check wall
                     self.pos_x += 1
             self.direction = RIGHT
         # move left
-        elif direction == 'left':
+        elif direction == LEFT:
             if self.pos_x > 0:  # check board limit
-                if m.array[self.pos_y][self.pos_x - 1] != 'w':  # check wall
+                if self.map.array[self.pos_y][self.pos_x - 1] != 'w':  # check wall
                     self.pos_x -= 1
             self.direction = LEFT
         # move up
-        elif direction == 'up':
+        elif direction == UP:
             if self.pos_y > 0:  # check board limit
-                if m.array[self.pos_y - 1][self.pos_x] != 'w':  # check wall
+                if self.map.array[self.pos_y - 1][self.pos_x] != 'w':  # check wall
                     self.pos_y -= 1
             self.direction = UP
         # move down
-        elif direction == 'down':
+        elif direction == DOWN:
             if self.pos_y < (m.height - 1):  # check board limit
-                if m.array[self.pos_y + 1][self.pos_x] != 'w':  # check wall
+                if self.map.array[self.pos_y + 1][self.pos_x] != 'w':  # check wall
                     self.pos_y += 1
             self.direction = DOWN
 
@@ -219,11 +238,11 @@ icon = pygame.image.load(win_icon)
 pygame.display.set_icon(icon)
 pygame.display.set_caption(win_title)
 clock = pygame.time.Clock()
-dk = Character("dk", imgs_dk, 0, 0)
-zelda = Character("zelda", imgs_zelda, 0, 1)
+dk = Character("dk", m, imgs_dk, 0, 0)
+zelda = Character("zelda", m, imgs_zelda, 0, 1)
 characters = [zelda, dk]
 current = dk
-bananas = [ Banana(*m.random()) for _ in range(10) ] # 10 bananas
+bananas = [ Banana(m, *m.random()) for _ in range(10) ] # 10 bananas
 bombs = []
 
 # main loop
@@ -245,15 +264,15 @@ while cont:
                 if current == dk: current = zelda
                 else: current = dk
             elif event.key == pygame.K_SPACE:
-                bombs.append(Bomb(current.pos_x, current.pos_y))
+                bombs.append(Bomb(m, current.pos_x, current.pos_y))
             elif event.key == pygame.K_RIGHT:
-                current.move(m, 'right')
+                current.move(RIGHT)
             elif event.key == pygame.K_LEFT:
-                current.move(m, 'left')
+                current.move(LEFT)
             elif event.key == pygame.K_UP:
-                current.move(m, 'up')
+                current.move(UP)
             elif event.key == pygame.K_DOWN:
-                current.move(m, 'down')
+                current.move(DOWN)
 
     # update
     for bomb in bombs:
