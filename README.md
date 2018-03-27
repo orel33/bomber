@@ -33,16 +33,16 @@ To start the game:
 
 ## Rules ##
 
-This game is similar to a classic "Bomber Man". This is a *standalone* version of the game for a single player. Each character starts the game with an initial amount of 50 health points. Each fruit brings the character with 10 extra health points, while each bomb explosion removes 10 health points. A character is dead when its health points reaches zero.
+This game is similar to a classic "Bomber Man". This is a *standalone* version of the game for a single player. Each character starts the game with an initial amount of 50 health points. Each fruit brings the character with 10 extra health points, while each bomb blast removes 10 health points. A character is dead when its health points reaches zero.
+A character gets immunity for a while after he's hit by a bomb blast. After a character drops a bomb, he is disarmed for a while.
 
 To play, just use the following keys:
-
   * use *arrows* to move the current character
-  * use *space* to drop a bomb, that will explode after a delay of 5 seconds
+  * press *space* to drop a bomb, that will explode after a delay of 5 seconds
   * press *escape* to quit the game
-  * press *tab* to change the current character (two characters initially available in this version, zelda and dk)
+  * press *tab* to change the current character (two characters are initially available in this version, *zelda* and *dk*)
 
-## Known Bug ##
+## Known Bugs ##
 
 The game uses 100% of CPU on some *pygame* version :-(
 
