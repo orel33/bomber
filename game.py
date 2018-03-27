@@ -16,8 +16,10 @@ print("pygame version: ", pygame.version.ver)
 
 FPS = 30
 LIFE = 50
-BOMB_IMMUNITY = 1500
-BOMB_INACTIVE = 2000
+MAX_RANGE = 5
+COUNTDOWN = 5
+IMMUNITY = 1500 # in ms
+DISARMED = 2000 # in ms
 LEFT = 0
 RIGHT = 1
 UP = 2
@@ -86,8 +88,8 @@ class Map:
     # def debug(self):
     #     for row in self.array:
     #         for square in row:
-    #             print(square, end='')
     #         print()
+    #             print(square, end='')
 
     def random(self):
         offset = random.randint(1, self.width*self.height)
@@ -118,13 +120,13 @@ class Banana:
 ### class Bomb ###
 
 class Bomb:
-    def __init__(self, m, pos_x, pos_y, max_range=5, countdown=5):
+    def __init__(self, m, pos_x, pos_y):
         self.map = m
         self.pos_x = pos_x
         self.pos_y = pos_y
-        self.max_range = max_range
-        self.countdown = countdown
-        self.time_to_explode = countdown * 1000 # in ms
+        self.max_range = MAX_RANGE
+        self.countdown = COUNTDOWN
+        self.time_to_explode = COUNTDOWN * 1000 # in ms
         self.img = pygame.image.load(img_bomb).convert_alpha()
         self.font = pygame.font.SysFont('Consolas', 20)
         # build bomb range
@@ -137,7 +139,7 @@ class Bomb:
         for ymin in range(self.pos_y, self.pos_y-self.max_range-1, -1):
             if ymin < 0 or self.map.array[ymin][self.pos_x] != '0': break
         self.range = [xmin+1, xmax-1, ymin+1, ymax-1]
-        print("drop bomb at position ({},{}) with range {}".format(pos_x,pos_y, self.range))
+        print("drop bomb at position ({},{})".format(pos_x,pos_y))
 
     def update(self, dt):
         # subtract the passed time `dt` from the timer each frame
@@ -175,8 +177,8 @@ class Character:
     def __init__(self, nickname, m, imgs, pos_x, pos_y):
         self.map = m
         self.life = LIFE
-        self.bomb_immunity = 0 # the character gets immunity against bomb during this time (in ms)
-        self.bomb_inactive = 0 # the character cannot drop a bomb during this time (in ms)
+        self.immunity = 0 # the character gets immunity against bomb during this time (in ms)
+        self.disarmed = 0 # the character cannot drop a bomb during this time (in ms)
         self.nickname = nickname
         self.imgs = [ pygame.image.load(img).convert_alpha() for img in imgs ]
         self.pos_x = pos_x
@@ -218,18 +220,18 @@ class Character:
 
     def update(self, dt):
         # subtract the passed time `dt` from the timer each frame
-        if self.bomb_immunity > 0: self.bomb_immunity -= dt
-        else: self.bomb_immunity = 0
-        if self.bomb_inactive > 0: self.bomb_inactive -= dt
-        else: self.bomb_inactive = 0
+        if self.immunity > 0: self.immunity -= dt
+        else: self.immunity = 0
+        if self.disarmed > 0: self.disarmed -= dt
+        else: self.disarmed = 0
 
     def explosion(self, bomb):
-        if self.bomb_immunity > 0: return False
+        if self.immunity > 0: return False
         horizontal = (self.pos_y == bomb.pos_y and self.pos_x >= bomb.range[LEFT] and self.pos_x <= bomb.range[RIGHT])
         vertical = (self.pos_x == bomb.pos_x and self.pos_y >= bomb.range[UP] and self.pos_y <= bomb.range[DOWN])
         if bomb.countdown == 1 and ( horizontal or vertical ):
             self.life -= 10
-            self.bomb_immunity = BOMB_IMMUNITY
+            self.immunity = IMMUNITY
             print("{}\'s life: {}".format(self.nickname, self.life))
         if self.life <= 0:
             print("{} is dead!".format(self.nickname))
@@ -278,17 +280,17 @@ while cont:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 cont = 0
-            elif event.key == pygame.K_w:
-                m.array[current.pos_y][current.pos_x] = 'w'
-            elif event.key == pygame.K_b:
-                m.array[current.pos_y][current.pos_x] = '0'
+            # elif event.key == pygame.K_w:
+            #     m.array[current.pos_y][current.pos_x] = 'w'
+            # elif event.key == pygame.K_b:
+            #     m.array[current.pos_y][current.pos_x] = '0'
             elif event.key == pygame.K_TAB:
                 if current == dk: current = zelda
                 else: current = dk
             elif event.key == pygame.K_SPACE:
-                if current.bomb_inactive == 0:
+                if current.disarmed == 0:
                     bombs.append(Bomb(m, current.pos_x, current.pos_y))
-                    current.bomb_inactive = BOMB_INACTIVE
+                    current.disarmed = DISARMED
             elif event.key == pygame.K_RIGHT:
                 current.move(RIGHT)
             elif event.key == pygame.K_LEFT:
@@ -322,6 +324,11 @@ while cont:
     for banana in bananas: banana.render(win)
     for character in characters: character.render(win)
     pygame.display.flip()
+
+    # game over
+    if not characters:
+        print("Game Over!")
+        break
 
 # the end
 pygame.quit()
