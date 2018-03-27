@@ -23,6 +23,8 @@ LEFT = 0
 RIGHT = 1
 UP = 2
 DOWN = 3
+X = 0
+Y = 1
 
 ### Game Parameters ###
 
@@ -85,12 +87,6 @@ class Map:
                 elif square == '0':
                     win.blit(self.bg, (x0, y0)) # background
 
-    # def debug(self):
-    #     for row in self.array:
-    #         for square in row:
-    #         print()
-    #             print(square, end='')
-
     def random(self):
         offset = random.randint(1, self.width*self.height)
         while offset > 0:
@@ -105,25 +101,23 @@ class Map:
 ### class Banana ###
 
 class Banana:
-    def __init__(self, m, pos_x, pos_y):
+    def __init__(self, m, pos):
         self.map = m
-        self.pos_x = pos_x
-        self.pos_y = pos_y
+        self.pos = pos
         self.img = pygame.image.load(img_banana).convert_alpha()
-        print("set banana at position ({},{})".format(pos_x,pos_y))
+        print("set banana at position ({},{})".format(pos[X],pos[Y]))
 
     def render(self, win):
-        x = self.pos_x * sprite_size
-        y = self.pos_y * sprite_size
+        x = self.pos[X] * sprite_size
+        y = self.pos[Y] * sprite_size
         win.blit(self.img, (x, y))
 
 ### class Bomb ###
 
 class Bomb:
-    def __init__(self, m, pos_x, pos_y):
+    def __init__(self, m, pos):
         self.map = m
-        self.pos_x = pos_x
-        self.pos_y = pos_y
+        self.pos = pos
         self.max_range = MAX_RANGE
         self.countdown = COUNTDOWN
         self.time_to_explode = COUNTDOWN * 1000 # in ms
@@ -131,16 +125,16 @@ class Bomb:
         self.img_fire = pygame.image.load(img_fire).convert_alpha()
         self.font = pygame.font.SysFont('Consolas', 20)
         # build bomb range
-        for xmax in range(self.pos_x, self.pos_x+self.max_range+1):
-            if xmax >= m.width or self.map.array[self.pos_y][xmax] != '0': break
-        for ymax in range(self.pos_y, self.pos_y+self.max_range+1):
-            if ymax >= m.height or self.map.array[ymax][self.pos_x] != '0': break
-        for xmin in range(self.pos_x, self.pos_x-self.max_range-1, -1):
-            if xmin < 0 or self.map.array[self.pos_y][xmin] != '0': break
-        for ymin in range(self.pos_y, self.pos_y-self.max_range-1, -1):
-            if ymin < 0 or self.map.array[ymin][self.pos_x] != '0': break
+        for xmax in range(self.pos[X], self.pos[X]+self.max_range+1):
+            if xmax >= m.width or self.map.array[self.pos[Y]][xmax] != '0': break
+        for ymax in range(self.pos[Y], self.pos[Y]+self.max_range+1):
+            if ymax >= m.height or self.map.array[ymax][self.pos[X]] != '0': break
+        for xmin in range(self.pos[X], self.pos[X]-self.max_range-1, -1):
+            if xmin < 0 or self.map.array[self.pos[Y]][xmin] != '0': break
+        for ymin in range(self.pos[Y], self.pos[Y]-self.max_range-1, -1):
+            if ymin < 0 or self.map.array[ymin][self.pos[X]] != '0': break
         self.range = [xmin+1, xmax-1, ymin+1, ymax-1]
-        print("drop bomb at position ({},{})".format(pos_x,pos_y))
+        print("drop bomb at position ({},{})".format(pos[X],pos[Y]))
 
     def update(self, dt):
         # subtract the passed time `dt` from the timer each frame
@@ -151,16 +145,16 @@ class Bomb:
             self.countdown = 0
 
     def explode(self, win):
-        x0 = self.pos_x
-        y0 = self.pos_y
+        x0 = self.pos[X]
+        y0 = self.pos[Y]
         for x in range(self.range[LEFT], self.range[RIGHT]+1):
             win.blit(self.img_fire, (x*sprite_size, y0*sprite_size))
         for y in range(self.range[UP], self.range[DOWN]+1):
             win.blit(self.img_fire, (x0*sprite_size, y*sprite_size))
 
     def draw(self, win):
-        x = self.pos_x * sprite_size
-        y = self.pos_y * sprite_size
+        x = self.pos[X] * sprite_size
+        y = self.pos[Y] * sprite_size
         win.blit(self.img_bomb, (x, y))
         x0 = x + sprite_size/2
         y0 = y + sprite_size/2
@@ -177,45 +171,44 @@ class Bomb:
 ### class Character ###
 
 class Character:
-    def __init__(self, nickname, m, imgs, pos_x, pos_y):
+    def __init__(self, nickname, m, imgs, pos):
         self.map = m
         self.life = LIFE
         self.immunity = 0 # the character gets immunity against bomb during this time (in ms)
         self.disarmed = 0 # the character cannot drop a bomb during this time (in ms)
         self.nickname = nickname
         self.imgs = [ pygame.image.load(img).convert_alpha() for img in imgs ]
-        self.pos_x = pos_x
-        self.pos_y = pos_y
+        self.pos = pos
         self.direction = RIGHT
 
     def move(self, direction):
         # move right
         if direction == RIGHT:
-            if self.pos_x < (m.width - 1):  # check board limit
-                if self.map.array[self.pos_y][self.pos_x + 1] != 'w':  # check wall
-                    self.pos_x += 1
+            if self.pos[X] < (m.width - 1):  # check board limit
+                if self.map.array[self.pos[Y]][self.pos[X] + 1] != 'w':  # check wall
+                    self.pos = (self.pos[X]+1, self.pos[Y])
             self.direction = RIGHT
         # move left
         elif direction == LEFT:
-            if self.pos_x > 0:  # check board limit
-                if self.map.array[self.pos_y][self.pos_x - 1] != 'w':  # check wall
-                    self.pos_x -= 1
+            if self.pos[X] > 0:  # check board limit
+                if self.map.array[self.pos[Y]][self.pos[X] - 1] != 'w':  # check wall
+                    self.pos = (self.pos[X]-1, self.pos[Y])
             self.direction = LEFT
         # move up
         elif direction == UP:
-            if self.pos_y > 0:  # check board limit
-                if self.map.array[self.pos_y - 1][self.pos_x] != 'w':  # check wall
-                    self.pos_y -= 1
+            if self.pos[Y] > 0:  # check board limit
+                if self.map.array[self.pos[Y] - 1][self.pos[X]] != 'w':  # check wall
+                    self.pos = (self.pos[X], self.pos[Y]-1)
             self.direction = UP
         # move down
         elif direction == DOWN:
-            if self.pos_y < (m.height - 1):  # check board limit
-                if self.map.array[self.pos_y + 1][self.pos_x] != 'w':  # check wall
-                    self.pos_y += 1
+            if self.pos[Y] < (m.height - 1):  # check board limit
+                if self.map.array[self.pos[Y] + 1][self.pos[X]] != 'w':  # check wall
+                    self.pos = (self.pos[X], self.pos[Y]+1)
             self.direction = DOWN
 
     def eat(self, banana):
-        if banana.pos_x == self.pos_x and banana.pos_y == self.pos_y:
+        if banana.pos[X] == self.pos[X] and banana.pos[Y] == self.pos[Y]:
             self.life += 10
             print("{}\'s life: {}".format(self.nickname, self.life))
             return True
@@ -230,8 +223,8 @@ class Character:
 
     def explosion(self, bomb):
         if self.immunity > 0: return False
-        horizontal = (self.pos_y == bomb.pos_y and self.pos_x >= bomb.range[LEFT] and self.pos_x <= bomb.range[RIGHT])
-        vertical = (self.pos_x == bomb.pos_x and self.pos_y >= bomb.range[UP] and self.pos_y <= bomb.range[DOWN])
+        horizontal = (self.pos[Y] == bomb.pos[Y] and self.pos[X] >= bomb.range[LEFT] and self.pos[X] <= bomb.range[RIGHT])
+        vertical = (self.pos[X] == bomb.pos[X] and self.pos[Y] >= bomb.range[UP] and self.pos[Y] <= bomb.range[DOWN])
         if bomb.countdown == 1 and ( horizontal or vertical ):
             self.life -= 10
             self.immunity = IMMUNITY
@@ -242,8 +235,8 @@ class Character:
         return False
 
     def render(self, win):
-        x = self.pos_x * sprite_size
-        y = self.pos_y * sprite_size
+        x = self.pos[X] * sprite_size
+        y = self.pos[Y] * sprite_size
         win.blit(self.imgs[self.direction], (x, y))
 
 ### Main Program ###
@@ -262,11 +255,11 @@ icon = pygame.image.load(win_icon)
 pygame.display.set_icon(icon)
 pygame.display.set_caption(win_title)
 clock = pygame.time.Clock()
-dk = Character("dk", m, imgs_dk, 0, 0)
-zelda = Character("zelda", m, imgs_zelda, 0, 1)
+dk = Character("dk", m, imgs_dk, m.random() )
+zelda = Character("zelda", m, imgs_zelda, m.random())
 characters = [zelda, dk]
 current = dk
-bananas = [ Banana(m, *m.random()) for _ in range(10) ] # 10 bananas
+bananas = [ Banana(m, m.random()) for _ in range(10) ] # 10 bananas
 bombs = []
 
 # main loop
@@ -283,16 +276,12 @@ while cont:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 cont = 0
-            # elif event.key == pygame.K_w:
-            #     m.array[current.pos_y][current.pos_x] = 'w'
-            # elif event.key == pygame.K_b:
-            #     m.array[current.pos_y][current.pos_x] = '0'
             elif event.key == pygame.K_TAB:
                 if current == dk: current = zelda
                 else: current = dk
             elif event.key == pygame.K_SPACE:
                 if current.disarmed == 0:
-                    bombs.append(Bomb(m, current.pos_x, current.pos_y))
+                    bombs.append(Bomb(m, current.pos))
                     current.disarmed = DISARMED
             elif event.key == pygame.K_RIGHT:
                 current.move(RIGHT)
