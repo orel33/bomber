@@ -32,7 +32,7 @@ BLUE = (0,0,255)
 BANANA = 0
 CHERRY = 1
 
-### Game Parameters ###
+### Parameters ###
 
 sprite_size = 30 # 30x30 pixels
 win_title = "What a Maze!"
@@ -48,7 +48,7 @@ img_fruits = [ "images/misc/banana.png", "images/misc/cherry.png" ]
 imgs_dk = [ "images/dk/left.png", "images/dk/right.png", "images/dk/up.png", "images/dk/down.png" ]
 imgs_zelda = [ "images/zelda/left.png", "images/zelda/right.png", "images/zelda/up.png", "images/zelda/down.png" ]
 
-### class Map ###
+### Class Map ###
 
 class Map:
     def __init__(self, filename):
@@ -74,13 +74,13 @@ class Map:
             self.width = len(self.array[0])
             print("load map \"{}\" of size {}x{}".format(self.filename, self.width, self.height))
 
-    def grid(self, win):
-        # horizontal lines
-        for y in range(0,self.height):
-            pygame.draw.line(win, BLUE, (0, y*sprite_size), (self.width*sprite_size, y*sprite_size), 1)
-        # vertical lines
-        for x in range(0,self.width):
-            pygame.draw.line(win, BLUE, (x*sprite_size, 0), (x*sprite_size,self.height*sprite_size), 1)
+    # def grid(self, win):
+    #     # horizontal lines
+    #     for y in range(0,self.height):
+    #         pygame.draw.line(win, BLUE, (0, y*sprite_size), (self.width*sprite_size, y*sprite_size), 1)
+    #     # vertical lines
+    #     for x in range(0,self.width):
+    #         pygame.draw.line(win, BLUE, (x*sprite_size, 0), (x*sprite_size,self.height*sprite_size), 1)
 
     def render(self, win):
         # win.blit(self.background, (0, 0))
@@ -118,7 +118,7 @@ class Map:
                 if offset == 0: break
         return (x,y)
 
-### class Fruit ###
+### Class Fruit ###
 
 class Fruit:
     def __init__(self, m, kind, pos):
@@ -133,7 +133,7 @@ class Fruit:
         y = self.pos[Y] * sprite_size
         win.blit(self.imgs[self.kind], (x, y))
 
-### class Bomb ###
+### Class Bomb ###
 
 class Bomb:
     def __init__(self, m, pos):
@@ -189,7 +189,7 @@ class Bomb:
         elif(self.countdown > 0):
             self.draw(win)
 
-### class Character ###
+### Class Character ###
 
 class Character:
     def __init__(self, nickname, m, imgs, pos):
@@ -334,7 +334,6 @@ while cont:
 
     # render all
     m.render(win)
-    # m.grid(win)
     for bomb in bombs: bomb.render(win)
     for fruit in fruits: fruit.render(win)
     for character in characters: character.render(win)
