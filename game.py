@@ -1,13 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: Utf-8 -*
 # Created by: https://openclassrooms.com/courses/interface-graphique-pygame-pour-python/tp-dk-labyrinthe
 # Modified by: aurelien.esnard@u-bordeaux.fr
 
-from __future__ import print_function # to use print() in Python 2.x
+# from __future__ import print_function # to use print() in Python 2.x
 import pygame
 import sys
 import random
-import enum
 
 ### python version ###
 print("python version: {}.{}.{}".format(sys.version_info[0], sys.version_info[1], sys.version_info[2]))
@@ -28,7 +27,7 @@ win_title = "What a Maze!"
 win_icon = "images/dk/right.png"
 img_bg = "images/misc/bg1.png"
 img_wall = "images/misc/wall.png"
-img_bomb = "images/misc/bomb.png"
+img_bomb = "images/misc/bomb2.png"
 img_banana = "images/misc/banana.png"
 imgs_dk = [ "images/dk/left.png", "images/dk/right.png", "images/dk/up.png", "images/dk/down.png" ]
 imgs_zelda = [ "images/zelda/left.png", "images/zelda/right.png", "images/zelda/up.png", "images/zelda/down.png" ]
@@ -88,10 +87,10 @@ class Map:
     #         print()
 
     def random(self):
-        offset = random.randint(0, self.width*self.height-1)
+        offset = random.randint(1, self.width*self.height)
         while offset > 0:
-            for y in range(0, self.height-1):
-                for x in range(0, self.width-1):
+            for y in range(0, self.height):
+                for x in range(0, self.width):
                     if self.array[y][x] == '0':
                         offset -= 1
                     if offset == 0: break
@@ -116,12 +115,13 @@ class Banana:
 ### class Bomb ###
 
 class Bomb:
-    def __init__(self, m, pos_x, pos_y, max_range=5, time_to_explode=5000):
+    def __init__(self, m, pos_x, pos_y, max_range=5, countdown=5):
         self.map = m
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.max_range = max_range
-        self.time_to_explode = time_to_explode
+        self.countdown = countdown
+        self.time_to_explode = countdown * 1000 # in ms
         self.img = pygame.image.load(img_bomb).convert_alpha()
         self.font = pygame.font.SysFont('Consolas', 20)
         # build bomb range
@@ -137,9 +137,11 @@ class Bomb:
         print("set bomb at position ({},{}) with range {}".format(pos_x,pos_y, self.range))
 
     def update(self, dt):
-        # subtract the passed time `dt` from the timer each frame.
         if self.time_to_explode > 0:
-            self.time_to_explode -= dt
+            self.time_to_explode -= dt # subtract the passed time `dt` from the timer each frame
+            self.countdown = int(self.time_to_explode / 1000) + 1
+        else:
+            self.countdown = 0
 
     def explode(self, win):
         x = self.pos_x * sprite_size
@@ -153,23 +155,22 @@ class Bomb:
     def render(self, win):
         x = self.pos_x * sprite_size
         y = self.pos_y * sprite_size
-        # win.blit(self.img, (x, y))
-        if(self.time_to_explode >= 0):
+        if(self.countdown == 1):
+            self.explode(win)
+        if(self.countdown > 0):
+            win.blit(self.img, (x, y))
             x0 = x + sprite_size/2
             y0 = y + sprite_size/2
-            count = int(self.time_to_explode / 1000) + 1
-            text = self.font.render(str(count), True, yellow)
-            rect = text.get_rect(center=(x0,y0))
+            text = self.font.render(str(self.countdown), True, yellow)
+            rect = text.get_rect(center=(x0-5,y0+5))
             win.blit(text, rect)
-        if(self.time_to_explode <= 0):
-            self.explode(win)
 
 ### class Character ###
 
 class Character:
     def __init__(self, nickname, m, imgs, pos_x, pos_y):
         self.map = m
-        self.score = 0
+        self.life = 50
         self.nickname = nickname
         self.imgs = [ pygame.image.load(img).convert_alpha() for img in imgs ]
         self.pos_x = pos_x
@@ -204,8 +205,18 @@ class Character:
 
     def eat(self, banana):
         if banana.pos_x == self.pos_x and banana.pos_y == self.pos_y:
-            self.score += 10
-            print("{}\'s score: {}".format(current.nickname, current.score))
+            self.life += 10
+            print("{}\'s life: {}".format(self.nickname, self.life))
+            return True
+        return False
+
+    def explosion(self, bomb):
+        horizontal = (self.pos_y == bomb.pos_y and self.pos_x >= bomb.range[LEFT] and self.pos_x <= bomb.range[RIGHT])
+        vertical = (self.pos_x == bomb.pos_x and self.pos_y >= bomb.range[UP] and self.pos_y <= bomb.range[DOWN])
+        if bomb.countdown == 1 and ( horizontal or vertical ):
+            print("{}\'s life: {}".format(self.nickname, self.life))
+            self.life -= 10
+        if self.life <= 0:
             return True
         return False
 
@@ -238,6 +249,7 @@ bananas = [ Banana(m, *m.random()) for _ in range(10) ] # 10 bananas
 bombs = []
 
 # main loop
+pygame.key.set_repeat(1,200) # repeat keydown events every 200ms
 cont = 1
 while cont:
     # make sure game doesn't run at more than x frames per second
@@ -268,17 +280,23 @@ while cont:
             elif event.key == pygame.K_DOWN:
                 current.move(DOWN)
 
-    # update
+    # update all
     for bomb in bombs:
         bomb.update(dt)
-        # if current.boom(bomb): bananas.remove(banana)
+        if bomb.countdown == 0: bombs.remove(bomb)
 
-    for banana in bananas:
-        if current.eat(banana): bananas.remove(banana)
+    for character in characters:
+        for bomb in bombs:
+            if bomb.countdown == 1 and character.explosion(bomb):
+                print("game over!")
+                cont = 0
+                break
+        for banana in bananas:
+            if character.eat(banana): bananas.remove(banana)
 
-    # render
+    # render all
     m.render(win)
-    m.grid(win)
+    # m.grid(win)
     for bomb in bombs: bomb.render(win)
     for banana in bananas: banana.render(win)
     for character in characters: character.render(win)
