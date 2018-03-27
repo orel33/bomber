@@ -288,6 +288,7 @@ while cont:
             elif event.key == pygame.K_SPACE:
                 if current.bomb_inactive == 0:
                     bombs.append(Bomb(m, current.pos_x, current.pos_y))
+                    current.bomb_inactive = BOMB_INACTIVE
             elif event.key == pygame.K_RIGHT:
                 current.move(RIGHT)
             elif event.key == pygame.K_LEFT:
