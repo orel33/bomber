@@ -61,13 +61,13 @@ class Map:
             self.width = len(self.array[0])
             print("load map \"{}\" of size {}x{}".format(self.filename, self.width, self.height))
 
-    # def grid(self, win):
-    #     # horizontal lines
-    #     for y in range(0,self.height):
-    #         pygame.draw.line(win, blue, (0, y*sprite_size), (self.width*sprite_size, y*sprite_size), 1)
-    #     # vertical lines
-    #     for x in range(0,self.width):
-    #         pygame.draw.line(win, blue, (x*sprite_size, 0), (x*sprite_size,self.height*sprite_size), 1)
+    def grid(self, win):
+        # horizontal lines
+        for y in range(0,self.height):
+            pygame.draw.line(win, blue, (0, y*sprite_size), (self.width*sprite_size, y*sprite_size), 1)
+        # vertical lines
+        for x in range(0,self.width):
+            pygame.draw.line(win, blue, (x*sprite_size, 0), (x*sprite_size,self.height*sprite_size), 1)
 
     def render(self, win):
         # win.blit(self.background, (0, 0))
@@ -124,23 +124,17 @@ class Bomb:
         self.time_to_explode = time_to_explode
         self.img = pygame.image.load(img_bomb).convert_alpha()
         self.font = pygame.font.SysFont('Consolas', 20)
-        self.range = self.build()
-        print("set bomb at position ({},{}) with range {}".format(pos_x,pos_y,self.range))
-
-    def build(self):
-        for xmax in range(self.pos_x, self.pos_x + self.max_range):
-            if xmax >= m.width or self.map.array[self.pos_y][xmax] != '0':
-                break
-        for ymax in range(self.pos_y, self.pos_y + self.max_range):
-            if ymax >= m.height or self.map.array[ymax][self.pos_x] != '0':
-                    break
-        for xmin in range(self.pos_x, self.pos_x - self.max_range, -1):
-            if xmin < 0 or self.map.array[self.pos_y][xmin] != '0':
-                break
-        for ymin in range(self.pos_y, self.pos_y - self.max_range, -1):
-            if ymin < 0 or self.map.array[ymin][self.pos_x] != '0':
-                break
-        return [xmin+1, xmax-1, ymin+1, ymax-1]
+        # build bomb range
+        for xmax in range(self.pos_x, self.pos_x+self.max_range+1):
+            if xmax >= m.width or self.map.array[self.pos_y][xmax] != '0': break
+        for ymax in range(self.pos_y, self.pos_y+self.max_range+1):
+            if ymax >= m.height or self.map.array[ymax][self.pos_x] != '0': break
+        for xmin in range(self.pos_x, self.pos_x-self.max_range-1, -1):
+            if xmin < 0 or self.map.array[self.pos_y][xmin] != '0': break
+        for ymin in range(self.pos_y, self.pos_y-self.max_range-1, -1):
+            if ymin < 0 or self.map.array[ymin][self.pos_x] != '0': break
+        self.range = [xmin+1, xmax-1, ymin+1, ymax-1]
+        print("set bomb at position ({},{}) with range {}".format(pos_x,pos_y, self.range))
 
     def update(self, dt):
         # subtract the passed time `dt` from the timer each frame.
@@ -153,15 +147,13 @@ class Bomb:
         x0 = x + sprite_size/2
         y0 = y + sprite_size/2
         thick = 2
-        pygame.draw.line(win, yellow, (x0,y0-thick/2), (x0+sprite_size/2+(sprite_size*self.range[RIGHT]),y0-thick/2), thick) # horizontal right
-        pygame.draw.line(win, yellow, (x0,y0-thick/2), (x0-sprite_size/2-(sprite_size*self.range[LEFT]),y0-thick/2), thick) # horizontal left
-        pygame.draw.line(win, yellow, (x0-thick/2,y0), (x0-thick/2,y0+sprite_size/2+(sprite_size*self.range[DOWN])), thick) # vertical down
-        pygame.draw.line(win, yellow, (x0-thick/2,y0), (x0-thick/2,y0-sprite_size/2-(sprite_size*self.range[UP])), thick) # vertical up
+        pygame.draw.line(win, yellow, (sprite_size*self.range[LEFT],y0-thick/2), (sprite_size*(self.range[RIGHT]+1),y0-thick/2), thick) # horizontal line
+        pygame.draw.line(win, yellow, (x0-thick/2, sprite_size*self.range[UP]), (x0-thick/2,sprite_size*(self.range[DOWN]+1)), thick) # vertical line
 
     def render(self, win):
         x = self.pos_x * sprite_size
         y = self.pos_y * sprite_size
-        win.blit(self.img, (x, y))
+        # win.blit(self.img, (x, y))
         if(self.time_to_explode >= 0):
             x0 = x + sprite_size/2
             y0 = y + sprite_size/2
@@ -258,8 +250,10 @@ while cont:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 cont = 0
-            elif event.key == pygame.K_d:
-                m.debug()
+            elif event.key == pygame.K_w:
+                m.array[current.pos_y][current.pos_x] = 'w'
+            elif event.key == pygame.K_b:
+                m.array[current.pos_y][current.pos_x] = '0'
             elif event.key == pygame.K_TAB:
                 if current == dk: current = zelda
                 else: current = dk
@@ -284,7 +278,7 @@ while cont:
 
     # render
     m.render(win)
-    # m.grid(win)
+    m.grid(win)
     for bomb in bombs: bomb.render(win)
     for banana in bananas: banana.render(win)
     for character in characters: character.render(win)
