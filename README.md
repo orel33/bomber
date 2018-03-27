@@ -1,6 +1,6 @@
-### Bomber Game ###
+# Bomber Man #
 
-This is a simple "bomber man" game written in Python 2/3, based on the *pygame* library.
+This is a simple "Bomber Man" game written in Python 2/3, based on the *pygame* library.
 
 ## Download & Install ##
 

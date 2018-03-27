@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: Utf-8 -*
-# Created by: https://openclassrooms.com/courses/interface-graphique-pygame-pour-python/tp-dk-labyrinthe
-# Modified by: aurelien.esnard@u-bordeaux.fr
+# Author: aurelien.esnard@u-bordeaux.fr
 
 import pygame
 import sys
@@ -11,7 +10,7 @@ import random
 print("python version: {}.{}.{}".format(sys.version_info[0], sys.version_info[1], sys.version_info[2]))
 print("pygame version: ", pygame.version.ver)
 
-### Game Constants ###
+### Constants ###
 
 FPS = 30
 LIFE = 50
@@ -35,9 +34,11 @@ CHERRY = 1
 ### Parameters ###
 
 sprite_size = 30 # 30x30 pixels
-win_title = "What a Maze!"
+win_title = "Bomber Man"
 win_icon = "images/dk/right.png"
 map_file = "maps/map0"
+
+### Image Files ###
 
 img_backgrounds = [ "images/misc/bg0.png", "images/misc/bg1.png", "images/misc/bg2.png" ]
 img_blank = "images/misc/blank.png"
@@ -263,7 +264,7 @@ class Character:
 
 ### Main Program ###
 
-# args
+# optional argument
 if len(sys.argv) == 2:
     map_file = sys.argv[1]
 
@@ -281,8 +282,8 @@ dk = Character("dk", m, imgs_dk, m.random() )
 zelda = Character("zelda", m, imgs_zelda, m.random())
 characters = [zelda, dk]
 current = dk
-fruits = [ Fruit(m, BANANA, m.random()) for _ in range(5) ]
-fruits += [ Fruit(m, CHERRY, m.random()) for _ in range(5) ]
+fruits = [ Fruit(m, BANANA, m.random()) for _ in range(5) ]  # 5 bananas
+fruits += [ Fruit(m, CHERRY, m.random()) for _ in range(5) ] # 5 cherries
 bombs = []
 
 # main loop
