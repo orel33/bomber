@@ -3,7 +3,6 @@
 # Created by: https://openclassrooms.com/courses/interface-graphique-pygame-pour-python/tp-dk-labyrinthe
 # Modified by: aurelien.esnard@u-bordeaux.fr
 
-# from __future__ import print_function # to use print() in Python 2.x
 import pygame
 import sys
 import random
@@ -33,10 +32,11 @@ win_icon = "images/dk/right.png"
 img_bg = "images/misc/bg1.png"
 img_wall = "images/misc/wall.png"
 img_bomb = "images/misc/bomb.png"
+img_fire = "images/misc/fire.png"
 img_banana = "images/misc/banana.png"
 imgs_dk = [ "images/dk/left.png", "images/dk/right.png", "images/dk/up.png", "images/dk/down.png" ]
 imgs_zelda = [ "images/zelda/left.png", "images/zelda/right.png", "images/zelda/up.png", "images/zelda/down.png" ]
-map_file = "map1"
+map_file = "maps/map0"
 yellow = (255, 255, 0)
 blue = (0,0,255)
 
@@ -127,7 +127,8 @@ class Bomb:
         self.max_range = MAX_RANGE
         self.countdown = COUNTDOWN
         self.time_to_explode = COUNTDOWN * 1000 # in ms
-        self.img = pygame.image.load(img_bomb).convert_alpha()
+        self.img_bomb = pygame.image.load(img_bomb).convert_alpha()
+        self.img_fire = pygame.image.load(img_fire).convert_alpha()
         self.font = pygame.font.SysFont('Consolas', 20)
         # build bomb range
         for xmax in range(self.pos_x, self.pos_x+self.max_range+1):
@@ -150,26 +151,28 @@ class Bomb:
             self.countdown = 0
 
     def explode(self, win):
+        x0 = self.pos_x
+        y0 = self.pos_y
+        for x in range(self.range[LEFT], self.range[RIGHT]+1):
+            win.blit(self.img_fire, (x*sprite_size, y0*sprite_size))
+        for y in range(self.range[UP], self.range[DOWN]+1):
+            win.blit(self.img_fire, (x0*sprite_size, y*sprite_size))
+
+    def draw(self, win):
         x = self.pos_x * sprite_size
         y = self.pos_y * sprite_size
+        win.blit(self.img_bomb, (x, y))
         x0 = x + sprite_size/2
         y0 = y + sprite_size/2
-        thick = 2
-        pygame.draw.line(win, yellow, (sprite_size*self.range[LEFT],y0-thick/2), (sprite_size*(self.range[RIGHT]+1),y0-thick/2), thick) # horizontal line
-        pygame.draw.line(win, yellow, (x0-thick/2, sprite_size*self.range[UP]), (x0-thick/2,sprite_size*(self.range[DOWN]+1)), thick) # vertical line
+        text = self.font.render(str(self.countdown), True, yellow)
+        rect = text.get_rect(center=(x0-5,y0+5))
+        win.blit(text, rect)
 
     def render(self, win):
-        x = self.pos_x * sprite_size
-        y = self.pos_y * sprite_size
         if(self.countdown == 1):
             self.explode(win)
-        if(self.countdown > 0):
-            win.blit(self.img, (x, y))
-            x0 = x + sprite_size/2
-            y0 = y + sprite_size/2
-            text = self.font.render(str(self.countdown), True, yellow)
-            rect = text.get_rect(center=(x0-5,y0+5))
-            win.blit(text, rect)
+        elif(self.countdown > 0):
+            self.draw(win)
 
 ### class Character ###
 
