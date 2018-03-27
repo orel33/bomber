@@ -15,6 +15,9 @@ print("pygame version: ", pygame.version.ver)
 ### Game Constants ###
 
 FPS = 30
+LIFE = 50
+BOMB_IMMUNITY = 1500
+BOMB_INACTIVE = 2000
 LEFT = 0
 RIGHT = 1
 UP = 2
@@ -27,7 +30,7 @@ win_title = "What a Maze!"
 win_icon = "images/dk/right.png"
 img_bg = "images/misc/bg1.png"
 img_wall = "images/misc/wall.png"
-img_bomb = "images/misc/bomb2.png"
+img_bomb = "images/misc/bomb.png"
 img_banana = "images/misc/banana.png"
 imgs_dk = [ "images/dk/left.png", "images/dk/right.png", "images/dk/up.png", "images/dk/down.png" ]
 imgs_zelda = [ "images/zelda/left.png", "images/zelda/right.png", "images/zelda/up.png", "images/zelda/down.png" ]
@@ -134,11 +137,12 @@ class Bomb:
         for ymin in range(self.pos_y, self.pos_y-self.max_range-1, -1):
             if ymin < 0 or self.map.array[ymin][self.pos_x] != '0': break
         self.range = [xmin+1, xmax-1, ymin+1, ymax-1]
-        print("set bomb at position ({},{}) with range {}".format(pos_x,pos_y, self.range))
+        print("drop bomb at position ({},{}) with range {}".format(pos_x,pos_y, self.range))
 
     def update(self, dt):
+        # subtract the passed time `dt` from the timer each frame
         if self.time_to_explode > 0:
-            self.time_to_explode -= dt # subtract the passed time `dt` from the timer each frame
+            self.time_to_explode -= dt
             self.countdown = int(self.time_to_explode / 1000) + 1
         else:
             self.countdown = 0
@@ -170,7 +174,9 @@ class Bomb:
 class Character:
     def __init__(self, nickname, m, imgs, pos_x, pos_y):
         self.map = m
-        self.life = 50
+        self.life = LIFE
+        self.bomb_immunity = 0 # the character gets immunity against bomb during this time (in ms)
+        self.bomb_inactive = 0 # the character cannot drop a bomb during this time (in ms)
         self.nickname = nickname
         self.imgs = [ pygame.image.load(img).convert_alpha() for img in imgs ]
         self.pos_x = pos_x
@@ -210,13 +216,23 @@ class Character:
             return True
         return False
 
+    def update(self, dt):
+        # subtract the passed time `dt` from the timer each frame
+        if self.bomb_immunity > 0: self.bomb_immunity -= dt
+        else: self.bomb_immunity = 0
+        if self.bomb_inactive > 0: self.bomb_inactive -= dt
+        else: self.bomb_inactive = 0
+
     def explosion(self, bomb):
+        if self.bomb_immunity > 0: return False
         horizontal = (self.pos_y == bomb.pos_y and self.pos_x >= bomb.range[LEFT] and self.pos_x <= bomb.range[RIGHT])
         vertical = (self.pos_x == bomb.pos_x and self.pos_y >= bomb.range[UP] and self.pos_y <= bomb.range[DOWN])
         if bomb.countdown == 1 and ( horizontal or vertical ):
-            print("{}\'s life: {}".format(self.nickname, self.life))
             self.life -= 10
+            self.bomb_immunity = BOMB_IMMUNITY
+            print("{}\'s life: {}".format(self.nickname, self.life))
         if self.life <= 0:
+            print("{} is dead!".format(self.nickname))
             return True
         return False
 
@@ -270,7 +286,8 @@ while cont:
                 if current == dk: current = zelda
                 else: current = dk
             elif event.key == pygame.K_SPACE:
-                bombs.append(Bomb(m, current.pos_x, current.pos_y))
+                if current.bomb_inactive == 0:
+                    bombs.append(Bomb(m, current.pos_x, current.pos_y))
             elif event.key == pygame.K_RIGHT:
                 current.move(RIGHT)
             elif event.key == pygame.K_LEFT:
@@ -280,19 +297,22 @@ while cont:
             elif event.key == pygame.K_DOWN:
                 current.move(DOWN)
 
-    # update all
+    # update bombs (and remove it)
     for bomb in bombs:
         bomb.update(dt)
         if bomb.countdown == 0: bombs.remove(bomb)
 
+    # update characters and eat bananas
     for character in characters:
-        for bomb in bombs:
-            if bomb.countdown == 1 and character.explosion(bomb):
-                print("game over!")
-                cont = 0
-                break
+        character.update(dt)
         for banana in bananas:
             if character.eat(banana): bananas.remove(banana)
+
+    # update characters after bomb explosion
+    for bomb in bombs:
+        for character in characters:
+            if bomb.countdown == 1 and character.explosion(bomb):
+                characters.remove(character)
 
     # render all
     m.render(win)
