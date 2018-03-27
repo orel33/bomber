@@ -25,22 +25,25 @@ UP = 2
 DOWN = 3
 X = 0
 Y = 1
+WALLS = ('w', 'x', 'z')
+BACKGROUNDS = ('0', '1', '2')
+YELLOW = (255, 255, 0)
+BLUE = (0,0,255)
 
 ### Game Parameters ###
 
 sprite_size = 30 # 30x30 pixels
 win_title = "What a Maze!"
 win_icon = "images/dk/right.png"
-img_bg = "images/misc/bg1.png"
-img_wall = "images/misc/wall.png"
+img_backgrounds = [ "images/misc/bg0.png", "images/misc/bg1.png", "images/misc/bg2.png" ]
+img_blank = "images/misc/blank.png"
+img_walls = [ "images/misc/wall0.png", "images/misc/wall1.png", "images/misc/wall2.png" ]
 img_bomb = "images/misc/bomb.png"
 img_fire = "images/misc/fire.png"
 img_banana = "images/misc/banana.png"
 imgs_dk = [ "images/dk/left.png", "images/dk/right.png", "images/dk/up.png", "images/dk/down.png" ]
 imgs_zelda = [ "images/zelda/left.png", "images/zelda/right.png", "images/zelda/up.png", "images/zelda/down.png" ]
 map_file = "maps/map0"
-yellow = (255, 255, 0)
-blue = (0,0,255)
 
 ### class Map ###
 
@@ -50,8 +53,9 @@ class Map:
         self.array = []
         self.width = 0
         self.height = 0
-        self.wall = pygame.image.load(img_wall).convert()
-        self.bg = pygame.image.load(img_bg).convert()
+        self.walls = [ pygame.image.load(img).convert() for img in img_walls ]
+        self.backgrounds = [ pygame.image.load(img).convert() for img in img_backgrounds ]
+        self.blank = pygame.image.load(img_blank).convert()
 
     def load(self):
         with open(self.filename, "r") as filename:
@@ -70,10 +74,10 @@ class Map:
     def grid(self, win):
         # horizontal lines
         for y in range(0,self.height):
-            pygame.draw.line(win, blue, (0, y*sprite_size), (self.width*sprite_size, y*sprite_size), 1)
+            pygame.draw.line(win, BLUE, (0, y*sprite_size), (self.width*sprite_size, y*sprite_size), 1)
         # vertical lines
         for x in range(0,self.width):
-            pygame.draw.line(win, blue, (x*sprite_size, 0), (x*sprite_size,self.height*sprite_size), 1)
+            pygame.draw.line(win, BLUE, (x*sprite_size, 0), (x*sprite_size,self.height*sprite_size), 1)
 
     def render(self, win):
         # win.blit(self.background, (0, 0))
@@ -82,17 +86,30 @@ class Map:
                 square = self.array[y][x]
                 x0 = x*sprite_size
                 y0 = y*sprite_size
+                # walls
                 if square == 'w':
-                    win.blit(self.wall, (x0, y0)) # wall
+                    win.blit(self.walls[0], (x0, y0))
+                elif square == 'x':
+                    win.blit(self.walls[1], (x0, y0))
+                elif square == 'z':
+                    win.blit(self.walls[2], (x0, y0))
+                # backgrounds
                 elif square == '0':
-                    win.blit(self.bg, (x0, y0)) # background
+                    win.blit(self.backgrounds[0], (x0, y0))
+                elif square == '1':
+                    win.blit(self.backgrounds[1], (x0, y0))
+                elif square == '2':
+                    win.blit(self.backgrounds[2], (x0, y0))
+                else:
+                    win.blit(self.blank, (x0, y0)) # blank
+
 
     def random(self):
         offset = random.randint(1, self.width*self.height)
         while offset > 0:
             for y in range(0, self.height):
                 for x in range(0, self.width):
-                    if self.array[y][x] == '0':
+                    if self.array[y][x] in BACKGROUNDS:
                         offset -= 1
                     if offset == 0: break
                 if offset == 0: break
@@ -126,13 +143,13 @@ class Bomb:
         self.font = pygame.font.SysFont('Consolas', 20)
         # build bomb range
         for xmax in range(self.pos[X], self.pos[X]+self.max_range+1):
-            if xmax >= m.width or self.map.array[self.pos[Y]][xmax] != '0': break
+            if xmax >= m.width or self.map.array[self.pos[Y]][xmax] not in BACKGROUNDS: break
         for ymax in range(self.pos[Y], self.pos[Y]+self.max_range+1):
-            if ymax >= m.height or self.map.array[ymax][self.pos[X]] != '0': break
+            if ymax >= m.height or self.map.array[ymax][self.pos[X]] not in BACKGROUNDS: break
         for xmin in range(self.pos[X], self.pos[X]-self.max_range-1, -1):
-            if xmin < 0 or self.map.array[self.pos[Y]][xmin] != '0': break
+            if xmin < 0 or self.map.array[self.pos[Y]][xmin] not in BACKGROUNDS: break
         for ymin in range(self.pos[Y], self.pos[Y]-self.max_range-1, -1):
-            if ymin < 0 or self.map.array[ymin][self.pos[X]] != '0': break
+            if ymin < 0 or self.map.array[ymin][self.pos[X]] not in BACKGROUNDS: break
         self.range = [xmin+1, xmax-1, ymin+1, ymax-1]
         print("drop bomb at position ({},{})".format(pos[X],pos[Y]))
 
@@ -158,7 +175,7 @@ class Bomb:
         win.blit(self.img_bomb, (x, y))
         x0 = x + sprite_size/2
         y0 = y + sprite_size/2
-        text = self.font.render(str(self.countdown), True, yellow)
+        text = self.font.render(str(self.countdown), True, YELLOW)
         rect = text.get_rect(center=(x0-5,y0+5))
         win.blit(text, rect)
 
@@ -184,26 +201,26 @@ class Character:
     def move(self, direction):
         # move right
         if direction == RIGHT:
-            if self.pos[X] < (m.width - 1):  # check board limit
-                if self.map.array[self.pos[Y]][self.pos[X] + 1] != 'w':  # check wall
+            if self.pos[X] < (m.width - 1):
+                if self.map.array[self.pos[Y]][self.pos[X] + 1] not in WALLS:
                     self.pos = (self.pos[X]+1, self.pos[Y])
             self.direction = RIGHT
         # move left
         elif direction == LEFT:
-            if self.pos[X] > 0:  # check board limit
-                if self.map.array[self.pos[Y]][self.pos[X] - 1] != 'w':  # check wall
+            if self.pos[X] > 0:
+                if self.map.array[self.pos[Y]][self.pos[X] - 1] not in WALLS:
                     self.pos = (self.pos[X]-1, self.pos[Y])
             self.direction = LEFT
         # move up
         elif direction == UP:
-            if self.pos[Y] > 0:  # check board limit
-                if self.map.array[self.pos[Y] - 1][self.pos[X]] != 'w':  # check wall
+            if self.pos[Y] > 0:
+                if self.map.array[self.pos[Y] - 1][self.pos[X]] not in WALLS:
                     self.pos = (self.pos[X], self.pos[Y]-1)
             self.direction = UP
         # move down
         elif direction == DOWN:
-            if self.pos[Y] < (m.height - 1):  # check board limit
-                if self.map.array[self.pos[Y] + 1][self.pos[X]] != 'w':  # check wall
+            if self.pos[Y] < (m.height - 1):
+                if self.map.array[self.pos[Y] + 1][self.pos[X]] not in WALLS:
                     self.pos = (self.pos[X], self.pos[Y]+1)
             self.direction = DOWN
 
