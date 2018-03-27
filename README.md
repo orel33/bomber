@@ -13,22 +13,28 @@ First clone the project available on GitHUB under GPL:
 To install Python (root privilege required):
 
 ```
-  $ sudo apt get install python pip      # python 2
-  $ sudo apt get install python3 pip3    # python 3
+  $ sudo apt get install python pip      # for python 2
+  $ sudo apt get install python3 pip3    # for python 3
 ```
 
 To install the *pygame* library (user privilege enough):
 
 ```
-  $ pip install pygame                   # python 2
-  $ pip3 install pygame                  # python 3
+  $ pip install pygame                   # for python 2
+  $ pip3 install pygame                  # for python 3
 ```
 
 To start the game:
 
 ```
-  $ python2 game.py                      # python 2
-  $ python3 game.py                      # python 3
+  $ python2 game.py                      # for python 2
+  $ python3 game.py                      # for python 3
+```
+
+By default, the map "maps/map0" is used, but you can generate you own map (*mymap*) and use it as follows:
+
+```
+  $ python3 game.py maps/mymap
 ```
 
 ## Rules ##
