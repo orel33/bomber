@@ -30,14 +30,14 @@ To install the *pygame* library (user privilege enough):
 To start the game:
 
 ```
-  $ python2 game.py                      # for python 2
-  $ python3 game.py                      # for python 3
+  $ python2 bomberman.py                      # for python 2
+  $ python3 bomberman.py                      # for python 3
 ```
 
 By default, the map "maps/map0" is used, but you can generate you own map (*mymap*) and use it as follows:
 
 ```
-  $ python3 game.py maps/mymap
+  $ python3 bomberman.py maps/mymap
 ```
 
 ## Rules ##
