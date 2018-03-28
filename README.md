@@ -42,8 +42,7 @@ By default, the map "maps/map0" is used, but you can generate you own map (*myma
 
 ## Rules ##
 
-This game is similar to a classic "Bomber Man". This is a *standalone* version of the game for a single player. Each character starts the game with an initial amount of 50 health points. Each fruit brings the character with 10 extra health points, while each bomb blast removes 10 health points. A character is dead when its health points reaches zero.
-A character gets immunity for a while after he's hit by a bomb blast. After a character drops a bomb, he is disarmed for a while.
+This game is similar to a classic "Bomber Man". This is a *standalone* version of the game for a single player. Each character starts the game with an initial amount of 50 health points. Each fruit brings the character with 10 extra health points, while each bomb blast removes 10 health points. A character is dead when its health points reach zero. A character gets immunity for a while after he's hit by a bomb blast. After a character drops a bomb, he is disarmed for a while.
 
 To play, just use the following keys:
   * use *arrows* to move the current character
