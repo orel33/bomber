@@ -40,7 +40,7 @@ img_bomb = "images/misc/bomb.png"
 img_fire = "images/misc/fire.png"
 img_fruits = [ "images/misc/banana.png", "images/misc/cherry.png" ]
 imgs_dk = [ "images/dk/left.png", "images/dk/right.png", "images/dk/up.png", "images/dk/down.png" ]
-imgs_zelda = [ "images/zelda/left.png", "images/zelda/right.png", "images/zelda/up.png", "images/zelda/down.png" ]
+imgs_link = [ "images/link/left.png", "images/link/right.png", "images/link/up.png", "images/link/down.png" ]
 imgs_batman = [ "images/batman/left.png", "images/batman/right.png", "images/batman/up.png", "images/batman/down.png" ]
 
 ### Parameters ###
@@ -282,9 +282,9 @@ pygame.display.set_icon(icon)
 pygame.display.set_caption(win_title)
 clock = pygame.time.Clock()
 dk = Character("dk", m, imgs_dk, m.random() )
-zelda = Character("zelda", m, imgs_zelda, m.random())
+link = Character("link", m, imgs_link, m.random())
 batman = Character("batman", m, imgs_batman, m.random())
-characters = [zelda, dk, batman]
+characters = [link, dk, batman]
 it = circular(characters)
 current = next(it)
 fruits = [ Fruit(m, BANANA, m.random()) for _ in range(5) ]  # 5 bananas
