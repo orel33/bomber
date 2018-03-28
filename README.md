@@ -2,7 +2,7 @@
 
 This is a simple "Bomber Man" game written in Python 2/3, based on the *pygame* library.
 
-![Bomber Man Snapshot](bomberman.png?raw=true "snapshot")
+![Bomber Man Snapshot](snap0.png?raw=true "snapshot")
 
 
 ## Download & Install ##
@@ -30,14 +30,14 @@ To install the *pygame* library (user privilege enough):
 To start the game:
 
 ```
-  $ python2 bomberman.py                      # for python 2
-  $ python3 bomberman.py                      # for python 3
+  $ python2 bomber.py                      # for python 2
+  $ python3 bomber.py                      # for python 3
 ```
 
 By default, the map "maps/map0" is used, but you can generate you own map (*mymap*) and use it as follows:
 
 ```
-  $ python3 bomberman.py maps/mymap
+  $ python3 bomber.py maps/mymap
 ```
 
 ## Rules ##
