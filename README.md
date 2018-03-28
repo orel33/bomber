@@ -49,7 +49,8 @@ To play, just use the following keys:
   * use *arrows* to move the current character
   * press *space* to drop a bomb, that will explode after a delay of 5 seconds
   * press *escape* to quit the game
-  * press *tab* to change the current character (two characters are initially available in this version, *zelda* and *dk*)
+  * press *tab* to change the current character (circular swap)
+  * press *k* to kill the current character
 
 ## Known Bugs ##
 
