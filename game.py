@@ -41,6 +41,7 @@ img_fire = "images/misc/fire.png"
 img_fruits = [ "images/misc/banana.png", "images/misc/cherry.png" ]
 imgs_dk = [ "images/dk/left.png", "images/dk/right.png", "images/dk/up.png", "images/dk/down.png" ]
 imgs_zelda = [ "images/zelda/left.png", "images/zelda/right.png", "images/zelda/up.png", "images/zelda/down.png" ]
+imgs_batman = [ "images/batman/left.png", "images/batman/right.png", "images/batman/up.png", "images/batman/down.png" ]
 
 ### Parameters ###
 
@@ -254,6 +255,15 @@ class Character:
         y = self.pos[Y] * sprite_size
         win.blit(self.imgs[self.direction], (x, y))
 
+
+# generator iterator used to iterate infinitely over a list
+# use next() to get the next element from the generator iterator
+# https://stackoverflow.com/questions/23416381/circular-list-iterator-in-python
+def circular(iterable):
+    while iterable:
+        for element in iterable:
+            yield element
+
 ### Main Program ###
 
 # optional argument
@@ -272,8 +282,10 @@ pygame.display.set_caption(win_title)
 clock = pygame.time.Clock()
 dk = Character("dk", m, imgs_dk, m.random() )
 zelda = Character("zelda", m, imgs_zelda, m.random())
-characters = [zelda, dk]
-current = dk
+batman = Character("batman", m, imgs_batman, m.random())
+characters = [zelda, dk, batman]
+it = circular(characters)
+current = next(it)
 fruits = [ Fruit(m, BANANA, m.random()) for _ in range(5) ]  # 5 bananas
 fruits += [ Fruit(m, CHERRY, m.random()) for _ in range(5) ] # 5 cherries
 bombs = []
@@ -292,9 +304,12 @@ while cont:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 cont = 0
+            elif event.key == pygame.K_k:
+                characters.remove(current)
+                if not characters: break
+                current = next(it)
             elif event.key == pygame.K_TAB:
-                if current == dk: current = zelda
-                else: current = dk
+                current = next(it)
             elif event.key == pygame.K_SPACE:
                 if current.disarmed == 0:
                     bombs.append(Bomb(m, current.pos))
@@ -333,9 +348,9 @@ while cont:
     pygame.display.flip()
 
     # game over
-    if not characters:
-        print("Game Over!")
-        break
+    if not characters: cont = 0
 
-# the end
+
+# quit
+print("Game Over!")
 pygame.quit()
