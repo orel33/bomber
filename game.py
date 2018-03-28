@@ -139,7 +139,7 @@ class Bomb:
         self.img_bomb = pygame.image.load(img_bomb).convert_alpha()
         self.img_fire = pygame.image.load(img_fire).convert_alpha()
         self.font = pygame.font.SysFont('Consolas', 20)
-        # build bomb range
+        # compute bomb range
         for xmax in range(self.pos[X], self.pos[X]+self.max_range+1):
             if xmax >= m.width or self.map.array[self.pos[Y]][xmax] not in BACKGROUNDS: break
         for ymax in range(self.pos[Y], self.pos[Y]+self.max_range+1):
@@ -255,14 +255,15 @@ class Character:
         y = self.pos[Y] * sprite_size
         win.blit(self.imgs[self.direction], (x, y))
 
-
 # generator iterator used to iterate infinitely over a list
 # use next() to get the next element from the generator iterator
+# next() will return None, if the list becomes empty
 # https://stackoverflow.com/questions/23416381/circular-list-iterator-in-python
 def circular(iterable):
     while iterable:
         for element in iterable:
             yield element
+    while True: yield None
 
 ### Main Program ###
 
@@ -299,21 +300,27 @@ while cont:
 
     # process all events
     for event in pygame.event.get():
+        # quit game
         if event.type == pygame.QUIT:
             cont = 0
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                cont = 0
-            elif event.key == pygame.K_k:
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            cont = 0
+        # interaction with current character
+        elif current and event.type == pygame.KEYDOWN:
+            # kill current character
+            if event.key == pygame.K_k:
+                print("{} is killed!".format(current.nickname))
                 characters.remove(current)
-                if not characters: break
-                current = next(it)
+                current = next(it) # return None if no character
+            # use next character
             elif event.key == pygame.K_TAB:
                 current = next(it)
+            # drop bomb
             elif event.key == pygame.K_SPACE:
                 if current.disarmed == 0:
                     bombs.append(Bomb(m, current.pos))
                     current.disarmed = DISARMED
+            # move current character
             elif event.key == pygame.K_RIGHT:
                 current.move(RIGHT)
             elif event.key == pygame.K_LEFT:
@@ -346,9 +353,6 @@ while cont:
     for fruit in fruits: fruit.render(win)
     for character in characters: character.render(win)
     pygame.display.flip()
-
-    # game over
-    if not characters: cont = 0
 
 
 # quit
