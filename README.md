@@ -1,6 +1,6 @@
 # Bomber Man #
 
-This is a simple "Bomber Man" game written in Python 2/3, based on the *pygame* library.
+This is a simple "Bomber Man" game written in Python 2/3, based on the *PyGame* library.
 
 ![Bomber Man Snapshot](snap0.png?raw=true "snapshot")
 
@@ -20,7 +20,7 @@ To install Python (root privilege required):
   $ sudo apt get install python3 pip3    # for python 3
 ```
 
-To install the *pygame* library (user privilege enough):
+To install the *PyGame* library (user privilege enough):
 
 ```
   $ pip install pygame                   # for python 2
@@ -53,9 +53,9 @@ To play, just use the following keys:
 
 ## Known Bugs ##
 
-The game uses 100% of CPU on some *pygame* version :-(
+The game uses 100% of CPU on some *PyGame* version :-(
 
 ## Documentation ##
 
   * https://www.pygame.org
-  * https://openclassrooms.com/courses/interface-graphique-pygame-pour-python/tp-dk-labyrinthe
+  * https://openclassrooms.com/courses/interface-graphique-PyGame-pour-python/tp-dk-labyrinthe
