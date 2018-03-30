@@ -4,7 +4,8 @@
 
 from model import *
 from view import *
-from controller import *
+# from controller import *
+from network import *
 import sys
 import pygame
 
@@ -17,26 +18,26 @@ print("pygame version: ", pygame.version.ver)
 ################################################################################
 
 # parse arguments
-map_file = DEFAULT_MAP
-if len(sys.argv) == 2:
-    map_file = sys.argv[1]
+if len(sys.argv) != 4:
+    print("Usage: {} host port nickname".format(sys.argv[0]))
+    sys.exit()
+host = sys.argv[1]
+port = int(sys.argv[2])
+nickname = sys.argv[3]
 
 # initialization
 pygame.init()
 clock = pygame.time.Clock()
 model = Model()
-model.load(map_file)
-for _ in range(10): model.fruit(random.choice(FRUITS), model.map.random())
-model.join("me", True)
-
-kb = KeyboardController(model)
+model.load(DEFAULT_MAP) # TODO: get real map from server!
+network = NetworkClientController(model, host, port, nickname)
 view = GraphicView(model)
 
 # main loop
 while True:
     # make sure game doesn't run at more than FPS frames per second
     dt = clock.tick(FPS)
-    if not kb.tick(dt): break
+    if not network.tick(dt): break
     model.tick(dt)
     view.tick(dt)
 

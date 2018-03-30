@@ -4,7 +4,7 @@
 
 from model import *
 from view import *
-from controller import *
+from network import *
 import sys
 import pygame
 
@@ -17,9 +17,15 @@ print("pygame version: ", pygame.version.ver)
 ################################################################################
 
 # parse arguments
-map_file = DEFAULT_MAP
 if len(sys.argv) == 2:
-    map_file = sys.argv[1]
+    port = int(sys.argv[1])
+    map_file = DEFAULT_MAP
+elif len(sys.argv) == 3:
+    port = int(sys.argv[1])
+    map_file = sys.argv[2]
+else:
+    print("Usage: {} port [map_file]".format(sys.argv[0]))
+    sys.exit()
 
 # initialization
 pygame.init()
@@ -27,18 +33,15 @@ clock = pygame.time.Clock()
 model = Model()
 model.load(map_file)
 for _ in range(10): model.fruit(random.choice(FRUITS), model.map.random())
-model.join("me", True)
 
-kb = KeyboardController(model)
-view = GraphicView(model)
+network = NetworkServerController(model, port)
 
 # main loop
 while True:
     # make sure game doesn't run at more than FPS frames per second
     dt = clock.tick(FPS)
-    if not kb.tick(dt): break
+    network.tick(dt)
     model.tick(dt)
-    view.tick(dt)
 
 # quit
 print("Game Over!")
