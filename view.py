@@ -54,7 +54,7 @@ class GraphicView:
         # init view
         pygame.display.set_icon(self.sprite_bomb)
         title = WIN_TITLE
-        if playername: title + " (" + playername + ")"
+        if playername: title = WIN_TITLE + " (" + playername + ")"
         pygame.display.set_caption(title)
         self.font = pygame.font.SysFont('Consolas', 20)
 

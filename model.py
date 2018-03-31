@@ -9,29 +9,38 @@ import random
 
 ### Constants ###
 
+# position / direction
+X = 0
+Y = 1
+DIRECTION_LEFT = 0
+DIRECTION_RIGHT = 1
+DIRECTION_UP = 2
+DIRECTION_DOWN = 3
+DIRECTIONS = [DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, DIRECTION_DOWN]
+DIRECTIONS_STR = ["left", "right", "up", "down"]
+
+# map
+WALLS = ('w', 'x', 'z')
+BACKGROUNDS = ('0', '1', '2')
+DEFAULT_MAP = "maps/map0"
+
+# fruit
+BANANA = 0
+CHERRY = 1
+FRUITS = [BANANA, CHERRY]
+FRUITS_STR = ["banana", "cherry"]
+
+# character
+DK = 0
+ZELDA = 1
+BATMAN = 2
+CHARACTERS = [DK, ZELDA, BATMAN]
+CHARACTERS_STR = ["dk", "zelda", "batman"]
 HEALTH = 50
 MAX_RANGE = 5
 COUNTDOWN = 5
 IMMUNITY = 1500 # in ms
 DISARMED = 2000 # in ms
-DIRECTION_LEFT = 0
-DIRECTION_RIGHT = 1
-DIRECTION_UP = 2
-DIRECTION_DOWN = 3
-X = 0
-Y = 1
-WALLS = ('w', 'x', 'z')
-BACKGROUNDS = ('0', '1', '2')
-DEFAULT_MAP = "maps/map0"
-# fruit type
-BANANA = 0
-CHERRY = 1
-FRUITS = [BANANA, CHERRY]
-# character type
-DK = 0
-ZELDA = 1
-BATMAN = 2
-CHARACTERS = [DK, ZELDA, BATMAN]
 
 ### Class Map ###
 
@@ -51,7 +60,6 @@ class Map:
             self.array = _array
             self.height = len(self.array)
             self.width = len(self.array[0])
-            print("load map \"{}\" of size {}x{}".format(self.filename, self.width, self.height))
 
     def random(self):
         while True:
@@ -68,7 +76,6 @@ class Fruit:
         self.map = m
         self.pos = pos
         self.kind = kind
-        print("set fruit {} at position ({},{})".format(kind, pos[X],pos[Y]))
 
 ### Class Bomb ###
 
@@ -89,7 +96,6 @@ class Bomb:
         for ymin in range(self.pos[Y], self.pos[Y]-self.max_range-1, -1):
             if ymin < 0 or self.map.array[ymin][self.pos[X]] not in BACKGROUNDS: break
         self.range = [xmin+1, xmax-1, ymin+1, ymax-1]
-        print("drop bomb at position ({},{})".format(pos[X],pos[Y]))
 
     def tick(self, dt):
         # subtract the passed time `dt` from the timer each frame
@@ -178,69 +184,78 @@ class Model:
         self.bombs = []
         self.player = None
 
-    def load(self, map_file):
-        self.map = Map(map_file)
-
     # look for a character, return None if not found
     def look(self, nickname):
         # https://stackoverflow.com/questions/9542738/python-find-in-list
         character = next( (c for c in self.characters if (c.nickname == nickname)), None) # first occurence
         return character
 
+    # load map from file
+    def load_map(self, map_file):
+        self.map = Map(map_file)
+        print("=> load map \"{}\" of size {}x{}".format(self.map.filename, self.map.width, self.map.height))
+
     # kill a character
-    def kill(self, nickname):
+    def kill_character(self, nickname):
         character = self.look(nickname)
         if not character:
             print("Error: nickname {} not found!".format(nickname))
             return None
         self.characters.remove(character)
         if self.player == character: self.player = None
-        print("{} is killed!".format(nickname))
+        print("=> kill \"{}\"".format(nickname))
         return character
 
-    # quit
-    def quit(self, nickname):
+    # quit game
+    def quit(self, nickname = None):
         cont = True
         if self.player and self.player.nickname == nickname:
             cont = False
         character = self.look(nickname)
-        if character: self.kill(nickname)
+        if character: self.kill_character(nickname)
+        print("=> quit \"{}\"".format(nickname))
         return cont
 
-    # join as new character
-    def join(self, nickname, isplayer, pos = None):
+    # add a new fruit
+    def add_fruit(self, kind = None, pos = None):
+        if not pos: pos = self.map.random()
+        if not kind: kind = random.choice(FRUITS)
+        self.fruits.append(Fruit(kind, self.map, pos))
+        print("=> add fruit ({}) at position ({},{})".format(FRUITS_STR[kind], pos[X], pos[Y]))
+
+    # add a new character
+    def add_character(self, nickname, isplayer = False, kind = None, pos = None):
         character = self.look(nickname)
         if character:
-            print("Error: nickname {} already used!".format(nickname))
+            print("Error: nickname \"{}\" already used!".format(nickname))
             return None
         if not pos: pos = self.map.random()
-        character = Character(nickname, random.choice(CHARACTERS), self.map, pos)
-        print("{} is born!".format(character.nickname))
+        if not kind: kind = random.choice(CHARACTERS)
+        character = Character(nickname, kind, self.map, pos)
+        print("=> add character \"{}\" ({}) as position ({},{})".format(nickname, CHARACTERS_STR[kind], pos[X], pos[Y]))
         self.characters.append(character)
         if isplayer: self.player = character
         return character
 
     # drop a bomb
-    def drop(self, nickname):
+    def drop_bomb(self, nickname):
         character = self.look(nickname)
         if not character:
-            print("Error: nickname {} not found!".format(nickname))
+            print("Error: nickname \"{}\" not found!".format(nickname))
             return
         if character.disarmed == 0:
             self.bombs.append(Bomb(self.map, character.pos))
             character.disarmed = DISARMED
+        print("=> drop bomb at position ({},{})".format(character.pos[X], character.pos[Y]))
 
     # move a character
-    def move(self, nickname, direction):
+    def move_character(self, nickname, direction):
         character = self.look(nickname)
         if not character:
-            print("Error: nickname {} not found!".format(nickname))
+            print("Error: nickname \"{}\" not found!".format(nickname))
             return
         character.move(direction)
-
-    # add fruit
-    def fruit(self, kind, pos):
-        self.fruits.append(Fruit(kind, self.map, pos))
+        print("=> move {} \"{}\" at position ({},{})".format(DIRECTIONS_STR[direction], nickname, character.pos[X], character.pos[Y]))
 
     # update model at each clock tick
     def tick(self, dt):
