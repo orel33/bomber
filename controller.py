@@ -1,43 +1,41 @@
 # -*- coding: Utf-8 -*
 # Author: aurelien.esnard@u-bordeaux.fr
 
-from model import *
 import pygame
 
 ################################################################################
 #                          KEYBOARD CONTROLLER                                 #
 ################################################################################
 
+
 ### Class KeyboardController ###
 
 class KeyboardController:
 
-    def __init__(self, model):
-        self.model = model
+    def __init__(self, evm):
+        self.evm = evm
         pygame.key.set_repeat(1,200) # repeat keydown events every 200ms
 
     def tick(self, dt):
+
         # process all events
         for event in pygame.event.get():
-            # quit game
+            cont = True
             if event.type == pygame.QUIT:
-                return False
+                cont = self.evm.keyboard_quit()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                return False
-            # player interaction
-            elif self.model.player and event.type == pygame.KEYDOWN:
-                nickname = self.model.player.nickname
-                # drop bomb
-                if  event.key == pygame.K_SPACE:
-                    self.model.drop_bomb(nickname)
-                # move
-                elif event.key == pygame.K_RIGHT:
-                    self.model.move_character(nickname, DIRECTION_RIGHT)
-                elif event.key == pygame.K_LEFT:
-                    self.model.move_character(nickname, DIRECTION_LEFT)
-                elif event.key == pygame.K_UP:
-                    self.model.move_character(nickname, DIRECTION_UP)
-                elif event.key == pygame.K_DOWN:
-                    self.model.move_character(nickname, DIRECTION_DOWN)
+                cont = self.evm.keyboard_quit()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                cont = self.evm.keyboard_press_space()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+                cont = self.evm.keyboard_press_arrow(pygame.K_LEFT)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+                cont =self.evm.keyboard_press_arrow(pygame.K_RIGHT)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                cont = self.evm.keyboard_press_arrow(pygame.K_UP)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                cont = self.evm.keyboard_press_arrow(pygame.K_DOWN)
+            # don't continue?
+            if not cont: return False
 
         return True

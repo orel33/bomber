@@ -13,6 +13,42 @@ print("python version: {}.{}.{}".format(sys.version_info[0], sys.version_info[1]
 print("pygame version: ", pygame.version.ver)
 
 ################################################################################
+#                             EVENT MANAGER                                    #
+################################################################################
+
+### Class EventManager ###
+
+class EventManager:
+
+    def __init__(self, model):
+        self.model = model
+
+    def keyboard_quit(self):
+        print("=> event \"keyboard_quit")
+        return False
+
+    def keyboard_press_arrow(self, key):
+        print("=> event \"keyboard_move")
+        if not self.model.player: return True
+        nickname = self.model.player.nickname
+        if key == pygame.K_RIGHT:
+            self.model.move_character(nickname, DIRECTION_RIGHT)
+        elif key == pygame.K_LEFT:
+            self.model.move_character(nickname, DIRECTION_LEFT)
+        elif key == pygame.K_UP:
+            self.model.move_character(nickname, DIRECTION_UP)
+        elif key == pygame.K_DOWN:
+            self.model.move_character(nickname, DIRECTION_DOWN)
+        return True
+
+    def keyboard_press_space(self):
+        print("=> event \"keyboard drop\"")
+        if not self.model.player: return True
+        nickname = self.model.player.nickname
+        self.model.drop_bomb(nickname)
+        return True
+
+################################################################################
 #                                 MAIN                                         #
 ################################################################################
 
@@ -29,7 +65,8 @@ model = Model()
 model.load_map(map_file)
 for _ in range(10): model.add_fruit()
 model.add_character("me", isplayer = True)
-kb = KeyboardController(model)
+evm = EventManager(model)
+kb = KeyboardController(evm)
 view = GraphicView(model)
 
 # main loop

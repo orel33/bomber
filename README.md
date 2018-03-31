@@ -16,19 +16,19 @@ First clone the project available on GitHUB under GPL:
 To install Python (root privilege required):
 
 ```
-  $ sudo apt get install python3 pip3    # for python 3
+  $ sudo apt get install python3 pip3
 ```
 
 To install the *PyGame* library (user privilege enough):
 
 ```
-  $ pip3 install pygame                  # for python 3
+  $ pip3 install pygame
 ```
 
 To start the game:
 
 ```
-  $ ./bomber.py                      # for python 3
+  $ ./bomber.py
 ```
 
 By default, the map "maps/map0" is used, but you can generate you own map (*mymap*) and use it as follows:
