@@ -4,7 +4,7 @@
 
 from model import *
 from view import *
-# from controller import *
+from controller import *
 from network import *
 import sys
 import pygame
@@ -31,13 +31,16 @@ pygame.font.init()
 clock = pygame.time.Clock()
 model = Model()
 model.load_map(DEFAULT_MAP) # TODO: the map, fruits and players should be received from server by network.
-network = NetworkClientController(model, host, port, nickname)
 view = GraphicView(model, nickname)
+evm = EventManagerClient(model)
+network = NetworkClientController(model, host, port, nickname)
+kb = KeyboardController(evm)
 
 # main loop
 while True:
     # make sure game doesn't run at more than FPS frames per second
     dt = clock.tick(FPS)
+    if not kb.tick(dt): break
     if not network.tick(dt): break
     model.tick(dt)
     view.tick(dt)

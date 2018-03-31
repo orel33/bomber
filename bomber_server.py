@@ -12,6 +12,7 @@ import pygame
 print("python version: {}.{}.{}".format(sys.version_info[0], sys.version_info[1], sys.version_info[2]))
 print("pygame version: ", pygame.version.ver)
 
+
 ################################################################################
 #                                 MAIN                                         #
 ################################################################################
@@ -34,6 +35,7 @@ clock = pygame.time.Clock()
 model = Model()
 model.load_map(map_file)
 for _ in range(10): model.add_fruit()
+# evm = EventManagerServer(model)
 network = NetworkServerController(model, port)
 # view = GraphicView(model, "server")
 

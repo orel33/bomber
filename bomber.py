@@ -23,12 +23,12 @@ class EventManager:
     def __init__(self, model):
         self.model = model
 
-    def keyboard_quit(self):
-        print("=> event \"keyboard_quit")
+    def quit(self):
+        print("=> event \"quit\"")
         return False
 
     def keyboard_press_arrow(self, key):
-        print("=> event \"keyboard_move")
+        print("=> event \"keyboard press arrow\"")
         if not self.model.player: return True
         nickname = self.model.player.nickname
         if key == pygame.K_RIGHT:
@@ -42,7 +42,7 @@ class EventManager:
         return True
 
     def keyboard_press_space(self):
-        print("=> event \"keyboard drop\"")
+        print("=> event \"keyboard press space\"")
         if not self.model.player: return True
         nickname = self.model.player.nickname
         self.model.drop_bomb(nickname)

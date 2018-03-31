@@ -22,9 +22,9 @@ class KeyboardController:
         for event in pygame.event.get():
             cont = True
             if event.type == pygame.QUIT:
-                cont = self.evm.keyboard_quit()
+                cont = self.evm.quit()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                cont = self.evm.keyboard_quit()
+                cont = self.evm.quit()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 cont = self.evm.keyboard_press_space()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
