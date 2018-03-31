@@ -24,13 +24,11 @@ if len(sys.argv) == 2:
 # initialization
 pygame.display.init()
 pygame.font.init()
-
 clock = pygame.time.Clock()
 model = Model()
-model.load(map_file)
-for _ in range(10): model.fruit(random.choice(FRUITS), model.map.random())
-model.join("me", True)
-
+model.load_map(map_file)
+for _ in range(10): model.add_fruit()
+model.add_character("me", isplayer = True)
 kb = KeyboardController(model)
 view = GraphicView(model)
 

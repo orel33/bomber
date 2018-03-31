@@ -30,9 +30,9 @@ pygame.display.init()
 pygame.font.init()
 clock = pygame.time.Clock()
 model = Model()
-model.load(DEFAULT_MAP) # TODO: get real map from server!
+model.load_map(DEFAULT_MAP) # TODO: the map, fruits and players should be received from server by network.
 network = NetworkClientController(model, host, port, nickname)
-view = GraphicView(model)
+view = GraphicView(model, nickname)
 
 # main loop
 while True:

@@ -1,6 +1,6 @@
 # Bomber Man #
 
-This is a simple "Bomber Man" game written in Python 2/3, based on the *PyGame* library.
+This is a simple "Bomber Man" game written in Python 3, based on the *PyGame* library.
 
 ![Bomber Man Snapshot](snap0.png?raw=true "snapshot")
 
@@ -16,28 +16,25 @@ First clone the project available on GitHUB under GPL:
 To install Python (root privilege required):
 
 ```
-  $ sudo apt get install python pip      # for python 2
   $ sudo apt get install python3 pip3    # for python 3
 ```
 
 To install the *PyGame* library (user privilege enough):
 
 ```
-  $ pip install pygame                   # for python 2
   $ pip3 install pygame                  # for python 3
 ```
 
 To start the game:
 
 ```
-  $ python2 bomber.py                      # for python 2
-  $ python3 bomber.py                      # for python 3
+  $ ./bomber.py                      # for python 3
 ```
 
 By default, the map "maps/map0" is used, but you can generate you own map (*mymap*) and use it as follows:
 
 ```
-  $ python3 bomber.py maps/mymap
+  $ ./bomber.py maps/mymap
 ```
 
 ## Rules ##

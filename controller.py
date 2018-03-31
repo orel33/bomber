@@ -29,15 +29,15 @@ class KeyboardController:
                 nickname = self.model.player.nickname
                 # drop bomb
                 if  event.key == pygame.K_SPACE:
-                    self.model.drop(nickname)
+                    self.model.drop_bomb(nickname)
                 # move
                 elif event.key == pygame.K_RIGHT:
-                    self.model.move(nickname, DIRECTION_RIGHT)
+                    self.model.move_character(nickname, DIRECTION_RIGHT)
                 elif event.key == pygame.K_LEFT:
-                    self.model.move(nickname, DIRECTION_LEFT)
+                    self.model.move_character(nickname, DIRECTION_LEFT)
                 elif event.key == pygame.K_UP:
-                    self.model.move(nickname, DIRECTION_UP)
+                    self.model.move_character(nickname, DIRECTION_UP)
                 elif event.key == pygame.K_DOWN:
-                    self.model.move(nickname, DIRECTION_DOWN)
+                    self.model.move_character(nickname, DIRECTION_DOWN)
 
         return True

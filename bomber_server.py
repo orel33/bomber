@@ -32,10 +32,10 @@ pygame.display.init()
 pygame.font.init()
 clock = pygame.time.Clock()
 model = Model()
-model.load(map_file)
-for _ in range(10): model.fruit(random.choice(FRUITS), model.map.random())
-
+model.load_map(map_file)
+for _ in range(10): model.add_fruit()
 network = NetworkServerController(model, port)
+# view = GraphicView(model, "server")
 
 # main loop
 while True:
@@ -43,6 +43,7 @@ while True:
     dt = clock.tick(FPS)
     network.tick(dt)
     model.tick(dt)
+    # view.tick(dt)
 
 # quit
 print("Game Over!")
