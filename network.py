@@ -43,19 +43,18 @@ class EventManagerClient:
     def __init__(self, model):
         self.model = model
 
+    # keyboard events
     def quit(self):
-        print("=> event \"quit")
-        # ...
+        print("=> event \"quit\"")
         return False
 
-    # keyboard events
-    def keyboard_press_arrow(self, key):
-        print("=> event \"keyboard press arrow\"")
+    def keyboard_move_character(self, direction):
+        print("=> event \"keyboard move direction\" {}".format(DIRECTIONS_STR[direction]))
         # ...
         return True
 
-    def keyboard_press_space(self):
-        print("=> event \"keyboard press space\"")
+    def keyboard_drop_bomb(self):
+        print("=> event \"keyboard drop bomb\"")
         # ...
         return True
 

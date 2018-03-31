@@ -2,6 +2,7 @@
 # Author: aurelien.esnard@u-bordeaux.fr
 
 import pygame
+from model import *
 
 ################################################################################
 #                          KEYBOARD CONTROLLER                                 #
@@ -26,15 +27,15 @@ class KeyboardController:
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 cont = self.evm.quit()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                cont = self.evm.keyboard_press_space()
+                cont = self.evm.keyboard_drop_bomb()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-                cont = self.evm.keyboard_press_arrow(pygame.K_LEFT)
+                cont = self.evm.keyboard_move_character(DIRECTION_LEFT)
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-                cont =self.evm.keyboard_press_arrow(pygame.K_RIGHT)
+                cont =self.evm.keyboard_move_character(DIRECTION_RIGHT)
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-                cont = self.evm.keyboard_press_arrow(pygame.K_UP)
+                cont = self.evm.keyboard_move_character(DIRECTION_UP)
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-                cont = self.evm.keyboard_press_arrow(pygame.K_DOWN)
+                cont = self.evm.keyboard_move_character(DIRECTION_DOWN)
             # don't continue?
             if not cont: return False
 
