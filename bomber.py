@@ -22,7 +22,9 @@ if len(sys.argv) == 2:
     map_file = sys.argv[1]
 
 # initialization
-pygame.init()
+pygame.display.init()
+pygame.font.init()
+
 clock = pygame.time.Clock()
 model = Model()
 model.load(map_file)

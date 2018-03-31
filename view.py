@@ -34,7 +34,7 @@ SPRITE_BATMAN = [ "images/batman/left.png", "images/batman/right.png", "images/b
 class GraphicView:
 
     # initialize PyGame graphic view
-    def __init__(self, model):
+    def __init__(self, model, playername = ""):
         self.model = model
         self.width = model.map.width*SPRITE_SIZE
         self.height = model.map.height*SPRITE_SIZE
@@ -53,7 +53,9 @@ class GraphicView:
         self.sprite_characters = [sprite_dk, sprite_zelda, sprite_batman]
         # init view
         pygame.display.set_icon(self.sprite_bomb)
-        pygame.display.set_caption(WIN_TITLE)
+        title = WIN_TITLE
+        if playername: title + " (" + playername + ")"
+        pygame.display.set_caption(title)
         self.font = pygame.font.SysFont('Consolas', 20)
 
     # render map view

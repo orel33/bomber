@@ -28,7 +28,8 @@ else:
     sys.exit()
 
 # initialization
-pygame.init()
+pygame.display.init()
+pygame.font.init()
 clock = pygame.time.Clock()
 model = Model()
 model.load(map_file)
