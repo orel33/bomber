@@ -56,7 +56,7 @@ The implementation of this game follows a simple MVC architecture (Model/View/Co
 
 ## Known Bugs ##
 
-The game uses 100% of CPU on some *PyGame* version :-(
+There is a (known bug)[https://github.com/pygame/pygame/issues/331] in the *pygame.mixer* module, which causes high CPU usage, when calling *pygame.init()*. A workaround is to disable the mixer module, *pygame.mixer.quit()* or not to enable it, by using *pygame.display.init()* and *pygame.font.init()* instead.
 
 ## Documentation ##
 

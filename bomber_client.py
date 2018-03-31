@@ -26,7 +26,8 @@ port = int(sys.argv[2])
 nickname = sys.argv[3]
 
 # initialization
-pygame.init()
+pygame.display.init()
+pygame.font.init()
 clock = pygame.time.Clock()
 model = Model()
 model.load(DEFAULT_MAP) # TODO: get real map from server!
