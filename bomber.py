@@ -4,7 +4,7 @@
 
 from model import *
 from view import *
-from controller import *
+from keyboard import *
 import sys
 import pygame
 
@@ -27,22 +27,16 @@ class EventManager:
         print("=> event \"quit\"")
         return False
 
-    def keyboard_press_arrow(self, key):
-        print("=> event \"keyboard press arrow\"")
+    def keyboard_move_character(self, direction):
+        print("=> event \"keyboard move direction\" {}".format(DIRECTIONS_STR[direction]))
         if not self.model.player: return True
         nickname = self.model.player.nickname
-        if key == pygame.K_RIGHT:
-            self.model.move_character(nickname, DIRECTION_RIGHT)
-        elif key == pygame.K_LEFT:
-            self.model.move_character(nickname, DIRECTION_LEFT)
-        elif key == pygame.K_UP:
-            self.model.move_character(nickname, DIRECTION_UP)
-        elif key == pygame.K_DOWN:
-            self.model.move_character(nickname, DIRECTION_DOWN)
+        if direction in DIRECTIONS:
+            self.model.move_character(nickname, direction)
         return True
 
-    def keyboard_press_space(self):
-        print("=> event \"keyboard press space\"")
+    def keyboard_drop_bomb(self):
+        print("=> event \"keyboard drop bomb\"")
         if not self.model.player: return True
         nickname = self.model.player.nickname
         self.model.drop_bomb(nickname)

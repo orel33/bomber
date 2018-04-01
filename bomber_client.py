@@ -4,7 +4,7 @@
 
 from model import *
 from view import *
-from controller import *
+from keyboard import *
 from network import *
 import sys
 import pygame
@@ -33,7 +33,7 @@ model = Model()
 model.load_map(DEFAULT_MAP) # TODO: the map, fruits and players should be received from server by network.
 view = GraphicView(model, nickname)
 evm = EventManagerClient(model)
-network = NetworkClientController(model, host, port, nickname)
+network = NetworkClientController(evm, host, port, nickname)
 kb = KeyboardController(evm)
 
 # main loop
