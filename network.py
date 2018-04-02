@@ -23,7 +23,8 @@ class EventManagerServer:
 
 class NetworkServerController:
 
-    def __init__(self, evm, port):
+    def __init__(self, model, evm, port):
+        self.model = model
         self.evm = evm
         self.port = port
         # ...
@@ -67,7 +68,8 @@ class EventManagerClient:
 
 class NetworkClientController:
 
-    def __init__(self, evm, host, port, nickname):
+    def __init__(self, model, evm, host, port, nickname):
+        self.model = model
         self.evm = evm
         self.host = host
         self.port = port

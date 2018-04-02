@@ -218,8 +218,8 @@ class Model:
 
     # add a new fruit
     def add_fruit(self, kind = None, pos = None):
-        if not pos: pos = self.map.random()
-        if not kind: kind = random.choice(FRUITS)
+        if pos is None: pos = self.map.random()
+        if kind is None: kind = random.choice(FRUITS)
         self.fruits.append(Fruit(kind, self.map, pos))
         print("=> add fruit ({}) at position ({},{})".format(FRUITS_STR[kind], pos[X], pos[Y]))
 
@@ -229,8 +229,8 @@ class Model:
         if character:
             print("Error: nickname \"{}\" already used!".format(nickname))
             return None
-        if not pos: pos = self.map.random()
-        if not kind: kind = random.choice(CHARACTERS)
+        if pos is None: pos = self.map.random()
+        if kind is None: kind = random.choice(CHARACTERS)
         character = Character(nickname, kind, self.map, pos)
         print("=> add character \"{}\" ({}) as position ({},{})".format(nickname, CHARACTERS_STR[kind], pos[X], pos[Y]))
         self.characters.append(character)
