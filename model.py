@@ -180,7 +180,7 @@ class Model:
 
     # initialize model
     def __init__(self):
-        self.map = None
+        self.map = Map()
         self.characters = []
         self.fruits = []
         self.bombs = []
@@ -194,7 +194,6 @@ class Model:
 
     # load map from file
     def load_map(self, filename):
-        self.map = Map()
         self.map.load(filename)
         print("=> load map \"{}\" of size {}x{}".format(filename, self.map.width, self.map.height))
 
