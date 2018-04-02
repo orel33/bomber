@@ -33,7 +33,7 @@ model = Model()
 model.load_map(DEFAULT_MAP) # TODO: the map, fruits and players should be received from server by network.
 view = GraphicView(model, nickname)
 evm = EventManagerClient(model)
-network = NetworkClientController(evm, host, port, nickname)
+network = NetworkClientController(model, evm, host, port, nickname)
 kb = KeyboardController(evm)
 
 # main loop
