@@ -45,11 +45,13 @@ DISARMED = 2000 # in ms
 ### Class Map ###
 
 class Map:
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self):
         self.array = []
-        # load map file
-        with open(self.filename, "r") as _file:
+        self.width = 0
+        self.height = 0
+
+    def load(self, filename):
+        with open(filename, "r") as _file:
             _array = []
             for row in _file:
                 _row = []
@@ -191,9 +193,10 @@ class Model:
         return character
 
     # load map from file
-    def load_map(self, map_file):
-        self.map = Map(map_file)
-        print("=> load map \"{}\" of size {}x{}".format(self.map.filename, self.map.width, self.map.height))
+    def load_map(self, filename):
+        self.map = Map()
+        self.map.load(filename)
+        print("=> load map \"{}\" of size {}x{}".format(filename, self.map.width, self.map.height))
 
     # kill a character
     def kill_character(self, nickname):
