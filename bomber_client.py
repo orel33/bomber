@@ -33,15 +33,16 @@ model = Model()
 model.load_map(DEFAULT_MAP) # TODO: the map, fruits and players should be received from server by network.
 view = GraphicView(model, nickname)
 evm = EventManagerClient(model)
-network = NetworkClientController(model, evm, host, port, nickname)
+client = NetworkClientController(model, evm, host, port, nickname)
 kb = KeyboardController(evm)
+evm.setNetworkClientController(client)
 
 # main loop
 while True:
     # make sure game doesn't run at more than FPS frames per second
     dt = clock.tick(FPS)
     if not kb.tick(dt): break
-    if not network.tick(dt): break
+    if not client.tick(dt): break
     model.tick(dt)
     view.tick(dt)
 

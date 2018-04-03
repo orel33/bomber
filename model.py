@@ -2,6 +2,7 @@
 # Author: aurelien.esnard@u-bordeaux.fr
 
 import random
+import sys
 
 ################################################################################
 #                                  MODEL                                       #
@@ -45,11 +46,13 @@ DISARMED = 2000 # in ms
 ### Class Map ###
 
 class Map:
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self):
         self.array = []
-        # load map file
-        with open(self.filename, "r") as _file:
+        self.width = 0
+        self.height = 0
+
+    def load(self, filename):
+        with open(filename, "r") as _file:
             _array = []
             for row in _file:
                 _row = []
@@ -178,7 +181,7 @@ class Model:
 
     # initialize model
     def __init__(self):
-        self.map = None
+        self.map = Map()
         self.characters = []
         self.fruits = []
         self.bombs = []
@@ -191,16 +194,16 @@ class Model:
         return character
 
     # load map from file
-    def load_map(self, map_file):
-        self.map = Map(map_file)
-        print("=> load map \"{}\" of size {}x{}".format(self.map.filename, self.map.width, self.map.height))
+    def load_map(self, filename):
+        self.map.load(filename)
+        print("=> load map \"{}\" of size {}x{}".format(filename, self.map.width, self.map.height))
 
     # kill a character
     def kill_character(self, nickname):
         character = self.look(nickname)
         if not character:
             print("Error: nickname {} not found!".format(nickname))
-            return None
+            sys.exit(1)
         self.characters.remove(character)
         if self.player == character: self.player = None
         print("=> kill \"{}\"".format(nickname))
@@ -228,7 +231,7 @@ class Model:
         character = self.look(nickname)
         if character:
             print("Error: nickname \"{}\" already used!".format(nickname))
-            return None
+            sys.exit(1)
         if pos is None: pos = self.map.random()
         if kind is None: kind = random.choice(CHARACTERS)
         character = Character(nickname, kind, self.map, pos)
@@ -242,7 +245,7 @@ class Model:
         character = self.look(nickname)
         if not character:
             print("Error: nickname \"{}\" not found!".format(nickname))
-            return
+            sys.exit(1)
         if character.disarmed == 0:
             self.bombs.append(Bomb(self.map, character.pos))
             character.disarmed = DISARMED
@@ -253,7 +256,7 @@ class Model:
         character = self.look(nickname)
         if not character:
             print("Error: nickname \"{}\" not found!".format(nickname))
-            return
+            sys.exit(1)
         character.move(direction)
         print("=> move {} \"{}\" at position ({},{})".format(DIRECTIONS_STR[direction], nickname, character.pos[X], character.pos[Y]))
 

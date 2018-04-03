@@ -13,6 +13,10 @@ class EventManagerServer:
 
     def __init__(self, model):
         self.model = model
+        self.server = None
+
+    def setNetworkServerController(self, server):
+        self.server = server
 
     # network events
     # ...
@@ -43,6 +47,10 @@ class EventManagerClient:
 
     def __init__(self, model):
         self.model = model
+        self.client = None
+
+    def setNetworkClientController(self, client):
+        self.client = client
 
     # keyboard events
     def quit(self):
