@@ -23,7 +23,7 @@ class EventManager:
     def __init__(self, model):
         self.model = model
 
-    def quit(self):
+    def keyboard_quit(self):
         print("=> event \"quit\"")
         return False
 

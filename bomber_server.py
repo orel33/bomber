@@ -35,9 +35,7 @@ clock = pygame.time.Clock()
 model = Model()
 model.load_map(map_file)
 for _ in range(10): model.add_fruit()
-evm = EventManagerServer(model)
-server = NetworkServerController(model, evm, port)
-evm.setNetworkServerController(server)
+server = NetworkServerController(model, port)
 # view = GraphicView(model, "server")
 
 # main loop

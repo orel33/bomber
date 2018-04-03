@@ -4,56 +4,38 @@
 from model import *
 
 ################################################################################
-#                         EVENT MANAGER SERVER                                 #
-################################################################################
-
-### Class EventManagerServer ###
-
-class EventManagerServer:
-
-    def __init__(self, model):
-        self.model = model
-        self.server = None
-
-    def setNetworkServerController(self, server):
-        self.server = server
-
-    # network events
-    # ...
-
-################################################################################
 #                          NETWORK SERVER CONTROLLER                           #
 ################################################################################
 
 class NetworkServerController:
 
-    def __init__(self, model, evm, port):
+    def __init__(self, model, port):
         self.model = model
-        self.evm = evm
         self.port = port
         # ...
+
+    # time event
 
     def tick(self, dt):
         # ...
         return True
 
 ################################################################################
-#                         EVENT MANAGER CLIENT                                 #
+#                          NETWORK CLIENT CONTROLLER                           #
 ################################################################################
 
-### Class EventManagerClient ###
+class NetworkClientController:
 
-class EventManagerClient:
-
-    def __init__(self, model):
+    def __init__(self, model, host, port, nickname):
         self.model = model
-        self.client = None
-
-    def setNetworkClientController(self, client):
-        self.client = client
+        self.host = host
+        self.port = port
+        self.nickname = nickname
+        # ...
 
     # keyboard events
-    def quit(self):
+
+    def keyboard_quit(self):
         print("=> event \"quit\"")
         return False
 
@@ -67,22 +49,7 @@ class EventManagerClient:
         # ...
         return True
 
-    # network events
-    # ...
-
-################################################################################
-#                          NETWORK CLIENT CONTROLLER                           #
-################################################################################
-
-class NetworkClientController:
-
-    def __init__(self, model, evm, host, port, nickname):
-        self.model = model
-        self.evm = evm
-        self.host = host
-        self.port = port
-        self.nickname = nickname
-        # ...
+    # time event
 
     def tick(self, dt):
         # ...
