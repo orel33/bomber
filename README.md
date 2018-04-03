@@ -46,10 +46,7 @@ To play, just use the following keys:
   * press *space* to drop a bomb at current position, that will explode after a delay of 5 seconds
   * press *escape* to quit the game
 
-The implementation of this game follows a simple MVC architecture (Model/View/Controller):
-  * the *model* ...
-  * the *controller* ...
-  * the *view* ...
+The implementation of this game follows a simple MVC architecture (Model/View/Controller).
 
 ## Known Bugs ##
 

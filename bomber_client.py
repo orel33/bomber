@@ -30,12 +30,10 @@ pygame.display.init()
 pygame.font.init()
 clock = pygame.time.Clock()
 model = Model()
-model.load_map(DEFAULT_MAP) # TODO: the map, fruits and players should be received from server by network.
+model.load_map(DEFAULT_MAP)
 view = GraphicView(model, nickname)
-evm = EventManagerClient(model)
-client = NetworkClientController(model, evm, host, port, nickname)
-kb = KeyboardController(evm)
-evm.setNetworkClientController(client)
+client = NetworkClientController(model, host, port, nickname)
+kb = KeyboardController(client)
 
 # main loop
 while True:
