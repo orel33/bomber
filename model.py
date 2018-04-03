@@ -2,6 +2,7 @@
 # Author: aurelien.esnard@u-bordeaux.fr
 
 import random
+import sys
 
 ################################################################################
 #                                  MODEL                                       #
