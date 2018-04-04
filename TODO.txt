@@ -6,6 +6,8 @@
     - Réception du modèle par le client
 
 2 - Gestion des connexions / déconnexions des joueurs
+    - Gestion des connections (OK)
+    - Gestion des déconnexions
 
 3 - Gestion des déplacements des joueurs
 
