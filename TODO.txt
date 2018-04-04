@@ -1,0 +1,14 @@
+(Objectifs donnés sur Moodle)
+
+1 - Récupération par le client du modèle serveur à travers le réseau (map, fruits, players)
+    - Connection serveur/client (OK)
+    - Envoie du modèle par le serveur (OK)
+    - Réception du modèle par le client
+
+2 - Gestion des connexions / déconnexions des joueurs
+
+3 - Gestion des déplacements des joueurs
+
+4 - Gestion des bombes
+
+5 - Extension à de multiples joueurs
