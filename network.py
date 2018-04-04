@@ -8,6 +8,17 @@ import socket
 #                          NETWORK SERVER CONTROLLER                           #
 ################################################################################
 
+# COMMANDES CLIENT -> SERVEUR
+#   CONNECTION NICK -> met à jour le model, envoie le model au nouveau client, envoie le nouveau joueur au clients déjà connectés, ajoute le nouveau client à la liste de clients
+#   MOVE NICK DIR -> mettre à jour le model
+#   BOMB NICK
+#   PART
+# COMMANDES CLIENT -> SERVEUR
+#   ADD FRUIT KIND X Y
+#   ADD PLAYER NICK KIND X Y
+#   MAP WIDTH HEIGHT DATA
+
+
 class NetworkServerController:
 
     def __init__(self, model, port):
@@ -68,11 +79,6 @@ class NetworkServerController:
         except BlockingIOError:
             return True
         return True
-
-        # CONNECTION NICK -> send_model()
-        # MOVE NICK DIR -> mettre à jour le model
-        # BOMB NICK
-        # PART
 
 ################################################################################
 #                          NETWORK CLIENT CONTROLLER                           #
