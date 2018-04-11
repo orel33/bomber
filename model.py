@@ -279,5 +279,4 @@ class Model:
         for bomb in self.bombs:
             for character in self.characters:
                 if character.explosion(bomb):
-                    self.characters.remove(character)
-                    self.player = None
+                    self.kill_character(character.nickname)
